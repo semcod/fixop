@@ -7,19 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.1] - 2026-03-07
+## [0.1.4] - 2026-03-07
 
 ### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update fixop/CHANGELOG.md
 - Update fixop/README.md
 
+### Test
+- Update tests/__init__.py
+- Update tests/test_main.py
+
 ### Other
-- Update .gitignore
-- Update Makefile
+- Update VERSION
 - Update fixop/LICENSE
+- Update fixop/VERSION
+
+## [0.1.3] - 2026-03-07
+
+### Other
 - Update fixop/pyproject.toml
-- Update fixop/setup.py
-- Update fixop/src/fixop/__init__.py
-- Update fixop/src/fixop/main.py
-- Update fixop/tests/__init__.py
-- Update fixop/tests/test_main.py
+
+## [0.1.2] - 2026-03-07
+
+### Other
+- Update fixop/pyproject.toml
+
+## [0.1.1] - 2026-03-07
+
+### Other
+- Update fixop/pyproject.toml
 
