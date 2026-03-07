@@ -1,0 +1,189 @@
+# fixop | 23f 3108L | python:23
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[23]:
+  src/fixop/__init__.py,77
+  src/fixop/classify.py,124
+  src/fixop/cli.py,201
+  src/fixop/containers.py,138
+  src/fixop/deploy.py,149
+  src/fixop/dns.py,162
+  src/fixop/firewall.py,93
+  src/fixop/health.py,205
+  src/fixop/models.py,80
+  src/fixop/ports.py,87
+  src/fixop/ssh.py,190
+  src/fixop/systemd.py,164
+  src/fixop/tls.py,156
+  tests/__init__.py,0
+  tests/conftest.py,50
+  tests/test_classify.py,87
+  tests/test_containers.py,75
+  tests/test_deploy.py,78
+  tests/test_dns.py,100
+  tests/test_firewall.py,52
+  tests/test_ports.py,55
+  tests/test_systemd.py,61
+  tests/test_tls.py,66
+D:
+  src/fixop/__init__.py:
+    i: dns.{check_container_dns,check_host_dns},models,ssh.{check_ssh_connectivity,check_ssh_key}
+    e: check_all
+    check_all(ctx:HostContext;domains:Any=None;containers:Any=None)->list[Issue]
+  src/fixop/classify.py:
+    i: re,__future__.annotations,models.{Category,FixStrategy,Issue,Severity}
+    e: classify_error,get_tip_for_failure,extract_missing_binary
+    _get_compiled_patterns()->list[tuple[Any,Category,str,Severity]]
+    classify_error(exit_code:int;stderr:str='';cmd:str='')->Issue
+    get_tip_for_failure(cmd:str;exit_code:int)->Any
+    extract_missing_binary(stderr:str)->str
+    _truncate(s:str;max_len:int)->str
+  src/fixop/cli.py:
+    i: argparse,json,sys,__future__.annotations,models.{Category,FixStrategy,HostContext,Issue,Severity},typing.Optional
+    e: main
+    main(argv:Any=None)->int
+    _cmd_check(args)->int
+    _cmd_fix(args)->int
+    _cmd_validate(args)->int
+    _cmd_check_tls(args)->int
+    _cmd_doctor(args)->int
+    _output_issues(issues:list[Issue];fmt:str='text')->None
+  src/fixop/containers.py:
+    i: __future__.annotations,models.{Category,FixStrategy,HostContext,Issue,Severity},ssh.run_remote
+    e: check_runtime,check_containers_running,check_disk_usage,check_memory
+    check_runtime(ctx:HostContext;runtime:str='podman')->list[Issue]
+    check_containers_running(ctx:HostContext;expected:Any=None;runtime:str='podman')->list[Issue]
+    check_disk_usage(ctx:HostContext;warn_mb:int=500)->list[Issue]
+    check_memory(ctx:HostContext;warn_percent:int=90)->list[Issue]
+  src/fixop/deploy.py:
+    i: re,__future__.annotations,models.{Category,FixStrategy,Issue,Severity},pathlib.Path,typing.Optional
+    e: check_unresolved_vars,check_placeholders,check_files_exist,scan_deploy_dir
+    check_unresolved_vars(paths:list[str];patterns:Optional[list[str]]=None)->list[Issue]
+    check_placeholders(paths:list[str])->list[Issue]
+    check_files_exist(file_patterns:list[str];base_dir:str='.')->list[Issue]
+    scan_deploy_dir(deploy_dir:str;globs:tuple[str;Ellipsis]=DEFAULT_DEPLOY_GLOBS)->list[Issue]
+  src/fixop/dns.py:
+    i: subprocess,__future__.annotations,models,pathlib.Path,typing.Optional
+    e: check_host_dns,check_container_dns,check_systemd_resolved,fix_resolv_conf,fix_disable_systemd_resolved,generate_container_resolv_conf
+    check_host_dns(ctx:HostContext;domain:str=TEST_DOMAIN)->list[Issue]
+    check_container_dns(ctx:HostContext;container:str='traefik';domain:str=TEST_DOMAIN)->list[Issue]
+    check_systemd_resolved(ctx:HostContext)->list[Issue]
+    fix_resolv_conf(ctx:HostContext;nameservers:Optional[list[str]]=None)->FixResult
+    fix_disable_systemd_resolved(ctx:HostContext)->FixResult
+    generate_container_resolv_conf(output_path:str='deploy/resolv.conf';nameservers:Optional[list[str]]=None)->str
+  src/fixop/firewall.py:
+    i: __future__.annotations,models,ssh.run_remote
+    e: check_ufw_forward_policy,check_nat_masquerade,fix_ufw_allow_routed,fix_nat_masquerade
+    check_ufw_forward_policy(ctx:HostContext)->list[Issue]
+    check_nat_masquerade(ctx:HostContext;subnet:str='10.88.0.0/16')->list[Issue]
+    fix_ufw_allow_routed(ctx:HostContext)->FixResult
+    fix_nat_masquerade(ctx:HostContext;subnet:str='10.88.0.0/16')->FixResult
+  src/fixop/health.py:
+    i: socket,subprocess,time,__future__.annotations,dataclasses.{dataclass,field},typing.Optional,urllib.error.{HTTPError,URLError},urllib.request.Request
+    e: HealthCheckResult,HealthReport,check_http_endpoint,check_ssh_service,check_tcp_port,run_health_checks
+    HealthCheckResult:   # Result of a single health check.
+    HealthReport: healthy_count(0),unhealthy_count(0)  # Aggregated health check report.
+    check_http_endpoint(name:str;url:str;expected_status:int=200;timeout:int=10;retries:int=1)->HealthCheckResult
+    check_ssh_service(name:str;host:str;user:str;ssh_key:Any=None;port:int=22;timeout:int=10)->HealthCheckResult
+    check_tcp_port(host:str;port:int;timeout:int=5)->HealthCheckResult
+    run_health_checks(ctx:HostContext;domains:Any=None;check_ssh:bool=True)->HealthReport
+    _unhealthy(name:str;url:str;start:float;error:str;status_code:Any=None)->HealthCheckResult
+  src/fixop/models.py:
+    i: __future__.annotations,dataclasses.{dataclass,field},enum.Enum,typing.Optional
+    e: Severity,Category,FixStrategy,Issue,FixResult,HostContext
+    Severity: 
+    Category: 
+    FixStrategy: 
+    Issue: __str__(0)  # A detected infrastructure problem.
+    FixResult: __str__(0)  # Result of applying a fix.
+  src/fixop/ports.py:
+    i: socket,subprocess,__future__.annotations,models.{Category,FixStrategy,Issue,Severity}
+    e: is_port_free,find_free_port_near,who_uses_port,is_container_process,check_port,check_ports
+    is_port_free(port:int;host:str='0.0.0.0')->bool
+    find_free_port_near(start:int;span:int=50)->Any
+    who_uses_port(port:int)->tuple[Any,Any]
+    is_container_process(process_name:Any)->bool
+    check_port(port:int)->list[Issue]
+    check_ports(ports:list[int])->list[Issue]
+  src/fixop/ssh.py:
+    i: os,subprocess,__future__.annotations,dataclasses.dataclass,models.{Category,FixStrategy,HostContext,Issue},pathlib.Path,typing.Optional
+    e: RemoteResult,run_remote,test_ssh_connection,check_ssh_key,check_ssh_connectivity
+    RemoteResult: success(0),output(0)  # Result of a remote command execution.
+    run_remote(ctx:HostContext;command:str;timeout:Any=None)->RemoteResult
+    test_ssh_connection(ctx:HostContext;timeout:int=10)->RemoteResult
+    check_ssh_key(key_path:str='~/.ssh/id_ed25519')->list[Issue]
+    check_ssh_connectivity(ctx:HostContext)->list[Issue]
+  src/fixop/systemd.py:
+    i: time,__future__.annotations,models,ssh.run_remote
+    e: check_unit_status,check_quadlet_loaded,daemon_reload,graceful_restart,graceful_restart_all
+    check_unit_status(ctx:HostContext;units:list[str])->list[Issue]
+    check_quadlet_loaded(ctx:HostContext;units:list[str])->list[Issue]
+    daemon_reload(ctx:HostContext)->FixResult
+    graceful_restart(ctx:HostContext;unit:str;delay:int=3)->FixResult
+    graceful_restart_all(ctx:HostContext;units:list[str];delay:int=3)->list[FixResult]
+  src/fixop/tls.py:
+    i: socket,ssl,datetime,__future__.annotations,datetime.timezone,models.{Category,FixStrategy,HostContext,Issue},typing.Optional
+    e: check_certificate,check_certificates,check_acme_readiness
+    check_certificate(domain:str;port:int=443;warn_days:int=14)->list[Issue]
+    check_certificates(domains:list[str];port:int=443;warn_days:int=14)->list[Issue]
+    check_acme_readiness(ctx:HostContext;container:str='traefik')->list[Issue]
+  tests/conftest.py:
+    i: subprocess,pytest,__future__.annotations,dataclasses.dataclass,fixop.models.HostContext,fixop.ssh.RemoteResult,typing.Optional,unittest.mock.{MagicMock,patch}
+    e: ctx,mock_run_remote,tmp_deploy_dir
+    ctx()
+    mock_run_remote()
+    tmp_deploy_dir(tmp_path)
+  tests/test_classify.py:
+    i: pytest,__future__.annotations,fixop.classify.{EXIT_CODE_MAP,STDERR_PATTERNS,classify_error,extract_missing_binary,get_tip_for_failure},fixop.models.{Category,Severity}
+    e: TestClassifyError,TestGetTipForFailure,TestExtractMissingBinary,TestDispatchTables
+    TestClassifyError: test_exit_code_137_oom(0),test_exit_code_255_ssh(0),test_exit_code_127_not_found(0),test_stderr_dns_timeout(0),test_stderr_connection_refused(0)
+    TestGetTipForFailure: test_ssh_exit_255(0),test_scp_exit_1(0),test_exit_126_permission(0),test_exit_127_not_found(0),test_no_tip(0)
+    TestExtractMissingBinary: test_bash_style(0),test_generic_style(0),test_no_match(0)
+    TestDispatchTables: test_exit_code_map_coverage(0),test_stderr_patterns_compile(0)
+  tests/test_containers.py:
+    i: pytest,__future__.annotations,fixop.containers.{check_containers_running,check_disk_usage,check_memory,check_runtime},fixop.models.{Category,HostContext,Severity},unittest.mock.patch
+    e: TestCheckRuntime,TestCheckContainersRunning,TestCheckDiskUsage,TestCheckMemory,ctx
+    TestCheckRuntime: test_podman_installed(1),test_podman_not_installed(1)
+    TestCheckContainersRunning: test_all_running(1),test_missing_container(1),test_no_expected(1)
+    TestCheckDiskUsage: test_enough_disk(1),test_low_disk(1),test_critical_disk(1)
+    TestCheckMemory: test_normal_memory(1),test_high_memory(1)
+    ctx()
+  tests/test_deploy.py:
+    i: pytest,__future__.annotations,fixop.deploy.{check_files_exist,check_placeholders,check_unresolved_vars,scan_deploy_dir},fixop.models.Category
+    e: TestCheckUnresolvedVars,TestCheckPlaceholders,TestCheckFilesExist,TestScanDeployDir
+    TestCheckUnresolvedVars: test_clean_file(1),test_unresolved_dollar_var(1),test_unresolved_template_var(1),test_skips_comments(1),test_nonexistent_file(0)
+    TestCheckPlaceholders: test_clean_file(1),test_example_com(1),test_changeme(1),test_skips_comments(1)
+    TestCheckFilesExist: test_files_present(1),test_files_missing(1)
+    TestScanDeployDir: test_scan_with_issues(1),test_nonexistent_dir(0)
+  tests/test_dns.py:
+    i: pytest,__future__.annotations,fixop.dns.{check_container_dns,check_host_dns,check_systemd_resolved,generate_container_resolv_conf},fixop.models.{Category,HostContext},unittest.mock.{MagicMock,patch}
+    e: TestCheckHostDns,TestCheckContainerDns,TestCheckSystemdResolved,TestGenerateContainerResolvConf,ctx
+    TestCheckHostDns: test_healthy_dns(1),test_broken_dns_nxdomain(1),test_dns_timeout(1)
+    TestCheckContainerDns: test_container_not_running(1),test_host_network_skip(1),test_broken_container_dns(1)
+    TestCheckSystemdResolved: test_not_active(1),test_active_and_working(1),test_active_but_broken(1)
+    TestGenerateContainerResolvConf: test_default_nameservers(1),test_custom_nameservers(1)
+    ctx()
+  tests/test_firewall.py:
+    i: pytest,__future__.annotations,fixop.firewall.{check_nat_masquerade,check_ufw_forward_policy},fixop.models.{Category,HostContext,Severity},fixop.ssh.RemoteResult,unittest.mock.patch
+    e: TestCheckUfwForwardPolicy,TestCheckNatMasquerade,ctx
+    TestCheckUfwForwardPolicy: test_ufw_not_installed(1),test_ufw_inactive(1),test_ufw_forward_accept(1),test_ufw_forward_drop(1)
+    TestCheckNatMasquerade: test_masquerade_exists(1),test_masquerade_missing(1)
+    ctx()
+  tests/test_ports.py:
+    i: pytest,__future__.annotations,fixop.models.Category,fixop.ports.{check_port,find_free_port_near,is_container_process,is_port_free,who_uses_port},unittest.mock.patch
+    e: TestIsPortFree,TestFindFreePortNear,TestIsContainerProcess,TestCheckPort
+    TestIsPortFree: test_free_port(0),test_occupied_port(0)
+    TestFindFreePortNear: test_finds_same_port(0),test_finds_next_port(0),test_no_free_port(0)
+    TestIsContainerProcess: test_docker(0),test_podman(0),test_nginx(0),test_none(0)
+    TestCheckPort: test_free_port(0),test_occupied_port(0)
+  tests/test_systemd.py:
+    i: pytest,__future__.annotations,fixop.models.{Category,HostContext,Severity},fixop.ssh.RemoteResult,fixop.systemd.{check_quadlet_loaded,check_unit_status,daemon_reload},unittest.mock.patch
+    e: TestCheckUnitStatus,TestCheckQuadletLoaded,TestDaemonReload,ctx
+    TestCheckUnitStatus: test_all_active(1),test_inactive_unit(1),test_failed_unit(1)
+    TestCheckQuadletLoaded: test_quadlet_found_and_loaded(1),test_quadlet_missing(1)
+    TestDaemonReload: test_success(1),test_failure(1)
+    ctx()
+  tests/test_tls.py:
+    i: socket,ssl,pytest,__future__.annotations,fixop.models.{Category,Severity},fixop.tls.{check_certificate,check_certificates},unittest.mock.{MagicMock,patch}
+    e: TestCheckCertificate,TestCheckCertificates
+    TestCheckCertificate: test_valid_certificate(0),test_self_signed_certificate(0),test_connection_refused(0),test_timeout(0)
+    TestCheckCertificates: test_multiple_domains(0)

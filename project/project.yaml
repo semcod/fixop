@@ -1,0 +1,395 @@
+version: '1'
+project:
+  name: fixop
+  repo: /home/tom/github/wronai/fixop
+  language: python
+  analyzed_at: '2026-03-07T09:08:00Z'
+  tool: code2llm
+  stats:
+    files: 13
+    lines: 3086
+    functions: 57
+    classes: 9
+health:
+  cc_avg: 5.6
+  critical_count: 10
+  critical_limit: 10
+  duplicates: 0
+  cycles: 0
+  alerts:
+  - type: high_fan_out
+    target: main
+    value: 17
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: check_unresolved_vars
+    value: 15
+    limit: 10
+    severity: error
+  - type: cc_exceeded
+    target: _output_issues
+    value: 18
+    limit: 15
+    severity: warning
+  - type: cc_exceeded
+    target: _cmd_fix
+    value: 16
+    limit: 15
+    severity: warning
+  - type: high_fan_out
+    target: check_certificate
+    value: 13
+    limit: 10
+    severity: warning
+  - type: high_fan_out
+    target: check_all
+    value: 12
+    limit: 10
+    severity: warning
+  - type: high_fan_out
+    target: scan_deploy_dir
+    value: 12
+    limit: 10
+    severity: warning
+  - type: high_fan_out
+    target: check_placeholders
+    value: 10
+    limit: 10
+    severity: warning
+  - type: high_fan_out
+    target: _cmd_fix
+    value: 10
+    limit: 10
+    severity: warning
+  - type: high_fan_out
+    target: _output_issues
+    value: 10
+    limit: 10
+    severity: warning
+  - type: high_fan_out
+    target: check_http_endpoint
+    value: 10
+    limit: 10
+    severity: warning
+modules:
+- path: src/fixop/cli.py
+  lines: 265
+  classes: 0
+  methods: 7
+  cc_max: 18
+  inbound_deps: 0
+  exports:
+  - name: main
+    type: function
+    cc: 8
+    fan_out: 17
+- path: src/fixop/deploy.py
+  lines: 191
+  classes: 0
+  methods: 4
+  cc_max: 14
+  inbound_deps: 1
+  exports:
+  - name: check_unresolved_vars
+    type: function
+    cc: 14
+    fan_out: 15
+  - name: check_placeholders
+    type: function
+    cc: 8
+    fan_out: 10
+  - name: check_files_exist
+    type: function
+    cc: 3
+  - name: scan_deploy_dir
+    type: function
+    cc: 6
+    fan_out: 12
+- path: src/fixop/tls.py
+  lines: 185
+  classes: 0
+  methods: 3
+  cc_max: 13
+  inbound_deps: 2
+  exports:
+  - name: check_certificate
+    type: function
+    cc: 13
+    fan_out: 13
+  - name: check_certificates
+    type: function
+    cc: 2
+  - name: check_acme_readiness
+    type: function
+    cc: 10
+- path: src/fixop/health.py
+  lines: 245
+  classes: 2
+  methods: 5
+  cc_max: 11
+  inbound_deps: 0
+  exports:
+  - name: HealthCheckResult
+    type: class
+    cc_avg: 0.0
+  - name: HealthReport
+    type: class
+    cc_avg: 0.0
+  - name: check_http_endpoint
+    type: function
+    cc: 11
+    fan_out: 10
+  - name: check_ssh_service
+    type: function
+    cc: 6
+  - name: check_tcp_port
+    type: function
+    cc: 2
+  - name: run_health_checks
+    type: function
+    cc: 10
+- path: src/fixop/classify.py
+  lines: 161
+  classes: 0
+  methods: 5
+  cc_max: 10
+  inbound_deps: 0
+  exports:
+  - name: classify_error
+    type: function
+    cc: 10
+  - name: get_tip_for_failure
+    type: function
+    cc: 9
+  - name: extract_missing_binary
+    type: function
+    cc: 4
+- path: src/fixop/systemd.py
+  lines: 206
+  classes: 0
+  methods: 5
+  cc_max: 10
+  inbound_deps: 1
+  exports:
+  - name: check_unit_status
+    type: function
+    cc: 10
+  - name: check_quadlet_loaded
+    type: function
+    cc: 4
+  - name: daemon_reload
+    type: function
+    cc: 1
+  - name: graceful_restart
+    type: function
+    cc: 6
+  - name: graceful_restart_all
+    type: function
+    cc: 3
+- path: src/fixop/dns.py
+  lines: 194
+  classes: 0
+  methods: 6
+  cc_max: 9
+  inbound_deps: 1
+  exports:
+  - name: check_host_dns
+    type: function
+    cc: 6
+  - name: check_container_dns
+    type: function
+    cc: 9
+  - name: check_systemd_resolved
+    type: function
+    cc: 5
+  - name: fix_resolv_conf
+    type: function
+    cc: 4
+  - name: fix_disable_systemd_resolved
+    type: function
+    cc: 1
+  - name: generate_container_resolv_conf
+    type: function
+    cc: 3
+- path: src/fixop/ssh.py
+  lines: 226
+  classes: 1
+  methods: 4
+  cc_max: 9
+  inbound_deps: 7
+  exports:
+  - name: RemoteResult
+    type: class
+    cc_avg: 0.0
+  - name: run_remote
+    type: function
+    cc: 4
+  - name: test_ssh_connection
+    type: function
+    cc: 3
+  - name: check_ssh_key
+    type: function
+    cc: 4
+  - name: check_ssh_connectivity
+    type: function
+    cc: 9
+- path: src/fixop/__init__.py
+  lines: 113
+  classes: 0
+  methods: 1
+  cc_max: 7
+  inbound_deps: 1
+  exports:
+  - name: check_all
+    type: function
+    cc: 7
+    fan_out: 12
+- path: src/fixop/containers.py
+  lines: 170
+  classes: 0
+  methods: 4
+  cc_max: 7
+  inbound_deps: 1
+  exports:
+  - name: check_runtime
+    type: function
+    cc: 3
+  - name: check_containers_running
+    type: function
+    cc: 7
+  - name: check_disk_usage
+    type: function
+    cc: 5
+  - name: check_memory
+    type: function
+    cc: 6
+- path: src/fixop/ports.py
+  lines: 112
+  classes: 0
+  methods: 6
+  cc_max: 7
+  inbound_deps: 0
+  exports:
+  - name: is_port_free
+    type: function
+    cc: 2
+  - name: find_free_port_near
+    type: function
+    cc: 5
+  - name: who_uses_port
+    type: function
+    cc: 5
+  - name: is_container_process
+    type: function
+    cc: 3
+  - name: check_port
+    type: function
+    cc: 7
+  - name: check_ports
+    type: function
+    cc: 2
+- path: src/fixop/firewall.py
+  lines: 118
+  classes: 0
+  methods: 4
+  cc_max: 5
+  inbound_deps: 1
+  exports:
+  - name: check_ufw_forward_policy
+    type: function
+    cc: 5
+  - name: check_nat_masquerade
+    type: function
+    cc: 3
+  - name: fix_ufw_allow_routed
+    type: function
+    cc: 1
+  - name: fix_nat_masquerade
+    type: function
+    cc: 1
+- path: src/fixop/models.py
+  lines: 103
+  classes: 6
+  methods: 3
+  cc_max: 2
+  inbound_deps: 0
+  exports:
+  - name: Severity
+    type: class
+    cc_avg: 0.0
+  - name: Category
+    type: class
+    cc_avg: 0.0
+  - name: FixStrategy
+    type: class
+    cc_avg: 0.0
+  - name: Issue
+    type: class
+    cc_avg: 1.0
+  - name: FixResult
+    type: class
+    cc_avg: 2.0
+  - name: HostContext
+    type: class
+    cc_avg: 1.0
+hotspots:
+- name: main
+  fan_out: 17
+  note: Main CLI entry point.
+- name: check_unresolved_vars
+  fan_out: 15
+  note: "Scan files for unresolved ${VAR} and {{VAR}} patterns.\n\nArgs:\n    paths:\
+    \ File pa"
+- name: check_certificate
+  fan_out: 13
+  note: "Check if domain has a valid TLS certificate.\n\nArgs:\n    domain: Domain\
+    \ name to c"
+- name: check_all
+  fan_out: 12
+  note: "Run all infrastructure checks on a remote host.\n\nArgs:\n    ctx: SSH connection\
+    \ c"
+- name: scan_deploy_dir
+  fan_out: 12
+  note: 'Scan a deploy directory for all common issues.
+
+
+    Combines check_unresolved_vars +'
+- name: check_placeholders
+  fan_out: 10
+  note: 'Detect placeholder values in deploy files (example.com, changeme, your-*).
+
+
+    Args'
+- name: _cmd_fix
+  fan_out: 10
+  note: Apply fixes.
+- name: _output_issues
+  fan_out: 10
+  note: Print issues in the requested format.
+- name: check_http_endpoint
+  fan_out: 10
+  note: "Check HTTP endpoint health.\n\nArgs:\n    name: Service name for display.\n\
+    \    url: "
+refactoring:
+  priorities:
+  - action: Split _cmd_fix (CC=16 → target CC<10)
+    impact: medium
+    effort: low
+    module: cli.py
+  - action: Split _output_issues (CC=18 → target CC<10)
+    impact: medium
+    effort: low
+    module: cli.py
+  - action: Reduce main fan-out (currently 17)
+    impact: medium
+    effort: medium
+  - action: Reduce check_unresolved_vars fan-out (currently 15)
+    impact: medium
+    effort: medium
+evolution:
+- date: '2026-03-07'
+  cc_avg: 5.6
+  critical: 10
+  lines: 3086
+  note: Automated analysis

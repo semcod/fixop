@@ -1,0 +1,106 @@
+# fixop | 13f 2289L | python:13
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[13]:
+  src/fixop/__init__.py,113
+  src/fixop/classify.py,161
+  src/fixop/cli.py,265
+  src/fixop/containers.py,170
+  src/fixop/deploy.py,191
+  src/fixop/dns.py,194
+  src/fixop/firewall.py,118
+  src/fixop/health.py,245
+  src/fixop/models.py,103
+  src/fixop/ports.py,112
+  src/fixop/ssh.py,226
+  src/fixop/systemd.py,206
+  src/fixop/tls.py,185
+D:
+  src/fixop/cli.py:
+    e: main,_cmd_check,_cmd_fix,_cmd_validate,_cmd_check_tls,_cmd_doctor,_output_issues
+    main(argv)
+    _cmd_check(args)
+    _cmd_fix(args)
+    _cmd_validate(args)
+    _cmd_check_tls(args)
+    _cmd_doctor(args)
+    _output_issues(issues;fmt)
+  src/fixop/deploy.py:
+    e: check_unresolved_vars,check_placeholders,check_files_exist,scan_deploy_dir
+    check_unresolved_vars(paths;patterns)
+    check_placeholders(paths)
+    check_files_exist(file_patterns;base_dir)
+    scan_deploy_dir(deploy_dir;globs)
+  src/fixop/tls.py:
+    e: check_certificate,check_certificates,check_acme_readiness
+    check_certificate(domain;port;warn_days)
+    check_certificates(domains;port;warn_days)
+    check_acme_readiness(ctx;container)
+  src/fixop/health.py:
+    e: HealthCheckResult,HealthReport,check_http_endpoint,check_ssh_service,check_tcp_port,run_health_checks,_unhealthy
+    HealthCheckResult:  # Result of a single health check...
+    HealthReport:  # Aggregated health check report...
+    check_http_endpoint(name;url;expected_status;timeout;retries)
+    check_ssh_service(name;host;user;ssh_key;port;timeout)
+    check_tcp_port(host;port;timeout)
+    run_health_checks(ctx;domains;check_ssh)
+    _unhealthy(name;url;start;error;status_code)
+  src/fixop/classify.py:
+    e: _get_compiled_patterns,classify_error,get_tip_for_failure,extract_missing_binary,_truncate
+    _get_compiled_patterns()
+    classify_error(exit_code;stderr;cmd)
+    get_tip_for_failure(cmd;exit_code)
+    extract_missing_binary(stderr)
+    _truncate(s;max_len)
+  src/fixop/systemd.py:
+    e: check_unit_status,check_quadlet_loaded,daemon_reload,graceful_restart,graceful_restart_all
+    check_unit_status(ctx;units)
+    check_quadlet_loaded(ctx;units)
+    daemon_reload(ctx)
+    graceful_restart(ctx;unit;delay)
+    graceful_restart_all(ctx;units;delay)
+  src/fixop/dns.py:
+    e: check_host_dns,check_container_dns,check_systemd_resolved,fix_resolv_conf,fix_disable_systemd_resolved,generate_container_resolv_conf
+    check_host_dns(ctx;domain)
+    check_container_dns(ctx;container;domain)
+    check_systemd_resolved(ctx)
+    fix_resolv_conf(ctx;nameservers)
+    fix_disable_systemd_resolved(ctx)
+    generate_container_resolv_conf(output_path;nameservers)
+  src/fixop/ssh.py:
+    e: RemoteResult,run_remote,test_ssh_connection,check_ssh_key,check_ssh_connectivity
+    RemoteResult:  # Result of a remote command execution...
+    run_remote(ctx;command;timeout)
+    test_ssh_connection(ctx;timeout)
+    check_ssh_key(key_path)
+    check_ssh_connectivity(ctx)
+  src/fixop/ports.py:
+    e: is_port_free,find_free_port_near,who_uses_port,is_container_process,check_port,check_ports
+    is_port_free(port;host)
+    find_free_port_near(start;span)
+    who_uses_port(port)
+    is_container_process(process_name)
+    check_port(port)
+    check_ports(ports)
+  src/fixop/__init__.py:
+    e: check_all
+    check_all(ctx;domains;containers)
+  src/fixop/containers.py:
+    e: check_runtime,check_containers_running,check_disk_usage,check_memory
+    check_runtime(ctx;runtime)
+    check_containers_running(ctx;expected;runtime)
+    check_disk_usage(ctx;warn_mb)
+    check_memory(ctx;warn_percent)
+  src/fixop/firewall.py:
+    e: check_ufw_forward_policy,check_nat_masquerade,fix_ufw_allow_routed,fix_nat_masquerade
+    check_ufw_forward_policy(ctx)
+    check_nat_masquerade(ctx;subnet)
+    fix_ufw_allow_routed(ctx)
+    fix_nat_masquerade(ctx;subnet)
+  src/fixop/models.py:
+    e: Severity,Category,FixStrategy,Issue,FixResult,HostContext
+    Severity(Enum):
+    Category(Enum):
+    FixStrategy(Enum):
+    Issue: __str__(0)  # A detected infrastructure problem...
+    FixResult: __str__(0)  # Result of applying a fix...
+    HostContext: __str__(0)  # SSH connection context for remote operations...

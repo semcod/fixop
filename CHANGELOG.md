@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-03-07
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update project.sh
+- Update project/analysis.toon
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/dashboard.html
+- Update project/evolution.toon
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 5 more files
+
 ## [0.1.7] - 2026-03-07
 
 ### Test
