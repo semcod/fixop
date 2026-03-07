@@ -12,7 +12,7 @@ Usage as CLI:
     fixop validate deploy/
 """
 
-__version__ = "0.1.13"
+__version__ = "0.1.14"
 
 # ── Core types ─────────────────────────────────────────
 from .models import (
@@ -33,6 +33,7 @@ from .systemd import check_unit_status, check_quadlet_loaded
 from .tls import check_certificate, check_certificates
 from .deploy import check_unresolved_vars, check_placeholders, check_files_exist
 from .classify import classify_error
+from .drift import check_file_drift, check_untracked_files
 
 # ── Fixes (repair problems) ───────────────────────────
 from .dns import fix_resolv_conf, fix_disable_systemd_resolved, generate_container_resolv_conf
@@ -108,6 +109,8 @@ __all__ = [
     "fix_resolv_conf", "fix_disable_systemd_resolved", "generate_container_resolv_conf",
     "fix_ufw_allow_routed", "fix_nat_masquerade_rule",
     "daemon_reload", "graceful_restart", "graceful_restart_all",
+    # Drift
+    "check_file_drift", "check_untracked_files",
     # Convenience
     "check_all",
 ]
