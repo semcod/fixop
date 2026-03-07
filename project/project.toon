@@ -1,23 +1,25 @@
-# fixop | 28f 3260L | python:28
+# fixop | 31f 3756L | python:31
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
-M[28]:
-  src/fixop/__init__.py,77
+M[31]:
+  src/fixop/__init__.py,79
   src/fixop/classify.py,124
-  src/fixop/cli/__init__.py,89
+  src/fixop/cli/__init__.py,100
   src/fixop/cli/check_cmd.py,52
+  src/fixop/cli/drift_cmd.py,21
   src/fixop/cli/fix_cmd.py,61
   src/fixop/cli/output.py,59
   src/fixop/cli/validate_cmd.py,18
   src/fixop/containers.py,138
   src/fixop/deploy.py,164
   src/fixop/dns.py,162
+  src/fixop/drift.py,152
   src/fixop/firewall.py,93
   src/fixop/health.py,205
   src/fixop/models.py,80
   src/fixop/ports.py,87
   src/fixop/ssh.py,115
   src/fixop/systemd.py,164
-  src/fixop/tls.py,156
+  src/fixop/tls.py,161
   src/fixop/transport.py,83
   tests/__init__.py,0
   tests/conftest.py,50
@@ -25,6 +27,7 @@ M[28]:
   tests/test_containers.py,75
   tests/test_deploy.py,78
   tests/test_dns.py,100
+  tests/test_drift.py,192
   tests/test_firewall.py,52
   tests/test_ports.py,55
   tests/test_systemd.py,61
@@ -51,6 +54,7 @@ D:
     _dispatch_fix(args)->int
     _dispatch_validate(args)->int
     _dispatch_check_tls(args)->int
+    _dispatch_drift(args)->int
     _dispatch_doctor(args)->int
   src/fixop/cli/check_cmd.py:
     i: models.{FixStrategy,HostContext,Severity},output.output_issues
@@ -58,6 +62,10 @@ D:
     cmd_check(args)->int
     cmd_doctor(args)->int
     _apply_fixes(ctx:HostContext;issues)->None
+  src/fixop/cli/drift_cmd.py:
+    i: output.output_issues
+    e: cmd_drift
+    cmd_drift(args)->int
   src/fixop/cli/fix_cmd.py:
     i: models.{FixStrategy,HostContext,Issue}
     e: cmd_fix
@@ -105,6 +113,13 @@ D:
     fix_resolv_conf(ctx:HostContext;nameservers:Optional[list[str]]=None)->FixResult
     fix_disable_systemd_resolved(ctx:HostContext)->FixResult
     generate_container_resolv_conf(output_path:str='deploy/resolv.conf';nameservers:Optional[list[str]]=None)->str
+  src/fixop/drift.py:
+    i: hashlib,re,models.{Category,FixStrategy,Issue,Severity},pathlib.Path
+    e: _BLOCK_RE,check_file_drift,check_untracked_files
+    _extract_blocks(readme_text:str)->dict[str, str]
+    _sha256(content:str)->str
+    check_file_drift(readme_path:Any;extracted_dir:Any)->list[Issue]
+    check_untracked_files(readme_path:Any;extracted_dir:Any)->list[Issue]
   src/fixop/firewall.py:
     i: models,transport.run_remote
     e: check_ufw_forward_policy,check_nat_masquerade,fix_ufw_allow_routed,fix_nat_masquerade
@@ -155,6 +170,10 @@ D:
   src/fixop/tls.py:
     i: socket,ssl,datetime,datetime.timezone,models.{Category,FixStrategy,HostContext,Issue,Severity},typing.Optional
     e: check_certificate,check_certificates,check_acme_readiness
+    _connect_and_get_cert(domain:str;port:int)->dict | None
+    _validate_expiry(cert:dict;domain:str;warn_days:int)->list[Issue]
+    _validate_issuer(cert:dict;domain:str)->list[Issue]
+    _handle_connection_error(e:Exception;domain:str;port:int)->Issue
     check_certificate(domain:str;port:int=443;warn_days:int=14)->list[Issue]
     check_certificates(domains:list[str];port:int=443;warn_days:int=14)->list[Issue]
     check_acme_readiness(ctx:HostContext;container:str='traefik')->list[Issue]
@@ -200,6 +219,13 @@ D:
     TestCheckSystemdResolved: test_not_active(1),test_active_and_working(1),test_active_but_broken(1)
     TestGenerateContainerResolvConf: test_default_nameservers(1),test_custom_nameservers(1)
     ctx()
+  tests/test_drift.py:
+    i: pytest,fixop.drift.{_extract_blocks,check_file_drift,check_untracked_files},fixop.models.Severity,pathlib.Path
+    e: TestExtractBlocks,TestCheckFileDrift,TestCheckUntrackedFiles,TestDriftCLI
+    TestExtractBlocks: test_new_format(0),test_old_format(0),test_template_meta_ignored(0),test_multiple_blocks(0)
+    TestCheckFileDrift: test_no_drift(1),test_drifted_file(1),test_missing_file(1),test_missing_readme(1),test_no_blocks(1)
+    TestCheckUntrackedFiles: test_all_tracked(1),test_untracked_file(1),test_excludes_venv(1),test_missing_dir(1)
+    TestDriftCLI: test_drift_cli_no_issues(1),test_drift_cli_with_drift(1),test_drift_cli_untracked_flag(1),test_drift_cli_json_format(2)
   tests/test_firewall.py:
     i: pytest,fixop.firewall.{check_nat_masquerade,check_ufw_forward_policy},fixop.models.{Category,HostContext,Severity},fixop.ssh.RemoteResult,unittest.mock.patch
     e: ctx,TestCheckUfwForwardPolicy,TestCheckNatMasquerade

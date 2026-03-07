@@ -3,30 +3,35 @@ project:
   name: fixop
   repo: /home/tom/github/wronai/fixop
   language: python
-  analyzed_at: '2026-03-07T17:35:34Z'
+  analyzed_at: '2026-03-07T18:31:27Z'
   tool: code2llm
   stats:
-    files: 18
-    lines: 3233
-    functions: 75
+    files: 20
+    lines: 3726
+    functions: 85
     classes: 9
 health:
-  cc_avg: 4.5
-  critical_count: 6
+  cc_avg: 4.3
+  critical_count: 7
   critical_limit: 10
   duplicates: 0
   cycles: 0
   alerts:
   - type: high_fan_out
-    target: main
-    value: 14
+    target: check_untracked_files
+    value: 18
     limit: 10
-    severity: warning
+    severity: error
   - type: high_fan_out
-    target: check_certificate
-    value: 13
+    target: check_file_drift
+    value: 16
     limit: 10
-    severity: warning
+    severity: error
+  - type: high_fan_out
+    target: main
+    value: 15
+    limit: 10
+    severity: error
   - type: high_fan_out
     target: check_all
     value: 12
@@ -38,12 +43,12 @@ health:
     limit: 10
     severity: warning
   - type: high_fan_out
-    target: check_placeholders
+    target: check_http_endpoint
     value: 10
     limit: 10
     severity: warning
   - type: high_fan_out
-    target: check_http_endpoint
+    target: check_placeholders
     value: 10
     limit: 10
     severity: warning
@@ -53,23 +58,21 @@ health:
     limit: 10
     severity: warning
 modules:
-- path: src/fixop/tls.py
-  lines: 185
+- path: src/fixop/drift.py
+  lines: 194
   classes: 0
-  methods: 3
-  cc_max: 13
-  inbound_deps: 2
+  methods: 4
+  cc_max: 11
+  inbound_deps: 1
   exports:
-  - name: check_certificate
-    type: function
-    cc: 13
-    fan_out: 13
-  - name: check_certificates
-    type: function
-    cc: 2
-  - name: check_acme_readiness
+  - name: check_file_drift
     type: function
     cc: 10
+    fan_out: 16
+  - name: check_untracked_files
+    type: function
+    cc: 11
+    fan_out: 18
 - path: src/fixop/health.py
   lines: 245
   classes: 2
@@ -134,6 +137,22 @@ modules:
   - name: graceful_restart_all
     type: function
     cc: 3
+- path: src/fixop/tls.py
+  lines: 192
+  classes: 0
+  methods: 7
+  cc_max: 10
+  inbound_deps: 2
+  exports:
+  - name: check_certificate
+    type: function
+    cc: 3
+  - name: check_certificates
+    type: function
+    cc: 2
+  - name: check_acme_readiness
+    type: function
+    cc: 10
 - path: src/fixop/cli/check_cmd.py
   lines: 73
   classes: 0
@@ -152,7 +171,7 @@ modules:
   classes: 0
   methods: 5
   cc_max: 9
-  inbound_deps: 2
+  inbound_deps: 3
   exports:
   - name: output_issues
     type: function
@@ -217,7 +236,7 @@ modules:
     cc: 6
     fan_out: 12
 - path: src/fixop/__init__.py
-  lines: 113
+  lines: 116
   classes: 0
   methods: 1
   cc_max: 7
@@ -302,16 +321,16 @@ modules:
     type: function
     cc: 1
 - path: src/fixop/cli/__init__.py
-  lines: 124
+  lines: 139
   classes: 0
-  methods: 7
+  methods: 8
   cc_max: 4
   inbound_deps: 0
   exports:
   - name: main
     type: function
     cc: 4
-    fan_out: 14
+    fan_out: 15
 - path: src/fixop/transport.py
   lines: 100
   classes: 1
@@ -326,6 +345,16 @@ modules:
     type: function
     cc: 4
   - name: test_ssh_connection
+    type: function
+    cc: 3
+- path: src/fixop/cli/drift_cmd.py
+  lines: 31
+  classes: 0
+  methods: 1
+  cc_max: 3
+  inbound_deps: 1
+  exports:
+  - name: cmd_drift
     type: function
     cc: 3
 - path: src/fixop/cli/validate_cmd.py
@@ -367,13 +396,21 @@ modules:
     type: class
     cc_avg: 1.0
 hotspots:
+- name: check_untracked_files
+  fan_out: 18
+  note: "Find files in extracted_dir not tracked by any markpact:file block.\n\nArgs:\n\
+    \    r"
+- name: check_file_drift
+  fan_out: 16
+  note: 'Compare markpact:file blocks in README against files on disk.
+
+
+    Reports:
+
+    - DRIFTE'
 - name: main
-  fan_out: 14
+  fan_out: 15
   note: Main CLI entry point.
-- name: check_certificate
-  fan_out: 13
-  note: "Check if domain has a valid TLS certificate.\n\nArgs:\n    domain: Domain\
-    \ name to c"
 - name: check_all
   fan_out: 12
   note: "Run all infrastructure checks on a remote host.\n\nArgs:\n    ctx: SSH connection\
@@ -384,24 +421,33 @@ hotspots:
 
 
     Combines check_unresolved_vars +'
+- name: check_http_endpoint
+  fan_out: 10
+  note: "Check HTTP endpoint health.\n\nArgs:\n    name: Service name for display.\n\
+    \    url: "
 - name: check_placeholders
   fan_out: 10
   note: 'Detect placeholder values in deploy files (example.com, changeme, your-*).
 
 
     Args'
-- name: check_http_endpoint
-  fan_out: 10
-  note: "Check HTTP endpoint health.\n\nArgs:\n    name: Service name for display.\n\
-    \    url: "
 - name: cmd_fix
   fan_out: 10
   note: Apply fixes for detected issues.
 refactoring:
-  priorities: []
+  priorities:
+  - action: Reduce check_untracked_files fan-out (currently 18)
+    impact: medium
+    effort: medium
+  - action: Reduce check_file_drift fan-out (currently 16)
+    impact: medium
+    effort: medium
+  - action: Reduce main fan-out (currently 15)
+    impact: medium
+    effort: medium
 evolution:
 - date: '2026-03-07'
-  cc_avg: 4.5
-  critical: 6
-  lines: 3233
+  cc_avg: 4.3
+  critical: 7
+  lines: 3726
   note: Automated analysis

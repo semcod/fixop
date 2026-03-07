@@ -187,3 +187,57 @@ key: value
         readme.write_text("# No blocks\n")
         issues = check_untracked_files(readme, tmp_path / "nonexistent")
         assert len(issues) == 0
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 4. CLI drift command
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestDriftCLI:
+
+    def test_drift_cli_no_issues(self, tmp_path):
+        from fixop.cli import main
+        readme = tmp_path / "README.md"
+        readme.write_text('```markpact:file path=app.py\nprint("hi")\n```\n')
+        src = tmp_path / "sandbox"
+        src.mkdir()
+        (src / "app.py").write_text('print("hi")\n')
+
+        rc = main(["drift", str(readme), str(src)])
+        assert rc == 0
+
+    def test_drift_cli_with_drift(self, tmp_path):
+        from fixop.cli import main
+        readme = tmp_path / "README.md"
+        readme.write_text('```markpact:file path=app.py\nprint("old")\n```\n')
+        src = tmp_path / "sandbox"
+        src.mkdir()
+        (src / "app.py").write_text('print("new")\n')
+
+        rc = main(["drift", str(readme), str(src)])
+        assert rc == 1
+
+    def test_drift_cli_untracked_flag(self, tmp_path):
+        from fixop.cli import main
+        readme = tmp_path / "README.md"
+        readme.write_text("# No blocks\n")
+        src = tmp_path / "sandbox"
+        src.mkdir()
+        (src / "extra.py").write_text("x = 1\n")
+
+        rc = main(["drift", str(readme), str(src), "--untracked"])
+        assert rc == 1
+
+    def test_drift_cli_json_format(self, tmp_path, capsys):
+        from fixop.cli import main
+        readme = tmp_path / "README.md"
+        readme.write_text('```markpact:file path=app.py\nprint("old")\n```\n')
+        src = tmp_path / "sandbox"
+        src.mkdir()
+        (src / "app.py").write_text('print("new")\n')
+
+        rc = main(["drift", str(readme), str(src), "--format", "json"])
+        assert rc == 1
+        out = capsys.readouterr().out
+        assert '"severity"' in out

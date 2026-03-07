@@ -1,6 +1,24 @@
-# fixop/flow | 75 func | 8 pipelines | 4 hub-types | 2026-03-07
+# fixop/flow | 85 func | 9 pipelines | 4 hub-types | 2026-03-07
 
-PIPELINES[8] (Refactor:8):
+PIPELINES[9] (Refactor:9):
+  Src [Refactor]: args → Issue
+              → _dispatch_check(args) → int             CC=1    pure ▶
+              → cmd_check(args) → int                   CC=9    pure
+              → check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue] CC=7    mutation
+              → check_certificates(domains:list[str], port:int, warn_days:int) → list[Issue] CC=2    mutation
+              → check_certificate(domain:str, port:int, warn_days:int) → list[Issue] CC=3    pure
+              → _handle_connection_error(e:Exception, domain:str, port:int) → Issue CC=5    pure ■
+              PURITY: 4/6 pure  BOTTLENECK: cmd_check(CC=9)
+
+  Src [Refactor]: args → Issue
+              → _dispatch_fix(args) → int               CC=1    pure ▶
+              → cmd_fix(args) → int                     CC=6    IO
+              → check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue] CC=7    mutation
+              → check_certificates(domains:list[str], port:int, warn_days:int) → list[Issue] CC=2    mutation
+              → check_certificate(domain:str, port:int, warn_days:int) → list[Issue] CC=3    pure
+              → _handle_connection_error(e:Exception, domain:str, port:int) → Issue CC=5    pure ■
+              PURITY: 3/6 pure  BOTTLENECK: check_all(CC=7)
+
   Src [Refactor]: args → list[Issue]
               → _dispatch_validate(args) → int          CC=1    pure ▶
               → cmd_validate(args) → int                CC=2    pure
@@ -10,21 +28,14 @@ PIPELINES[8] (Refactor:8):
               → _scan_line_for_vars(line:str, lineno:int, filepath:Path, extra_patterns:list[re.Pattern]) → list[Issue] CC=6    mutation ■
               PURITY: 2/6 pure  BOTTLENECK: scan_deploy_dir(CC=6)
 
-  Src [Refactor]: args → tuple[int, int, int]
-              → _dispatch_check(args) → int             CC=1    pure ▶
-              → cmd_check(args) → int                   CC=9    pure
-              → output_issues(issues:list[Issue], fmt:str) → None CC=2    IO
-              → _format_text(issues:list[Issue]) → str  CC=9    mutation
-              → _summarize(issues:list[Issue]) → tuple[int, int, int] CC=7    pure ■
-              PURITY: 3/5 pure  BOTTLENECK: cmd_check(CC=9)
-
-  Src [Refactor]: args → RemoteResult
-              → _dispatch_fix(args) → int               CC=1    pure ▶
-              → cmd_fix(args) → int                     CC=6    IO
-              → _apply_all(ctx:HostContext, fixable:list[Issue], auto:bool, interactive:bool) → list[bool] CC=6    mutation
-              → _apply_single(ctx:HostContext, issue:Issue) → bool CC=2    IO
-              → run_remote(ctx:HostContext, command:str, timeout:int | None) → RemoteResult CC=4    pure ■
-              PURITY: 2/5 pure  BOTTLENECK: cmd_fix(CC=6)
+  Src [Refactor]: args → Issue
+              → _dispatch_doctor(args) → int            CC=1    pure ▶
+              → cmd_doctor(args) → int                  CC=8    IO
+              → check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue] CC=7    mutation
+              → check_certificates(domains:list[str], port:int, warn_days:int) → list[Issue] CC=2    mutation
+              → check_certificate(domain:str, port:int, warn_days:int) → list[Issue] CC=3    pure
+              → _handle_connection_error(e:Exception, domain:str, port:int) → Issue CC=5    pure ■
+              PURITY: 3/6 pure  BOTTLENECK: cmd_doctor(CC=8)
 
   Src [Refactor]: args → tuple[int, int, int]
               → _dispatch_check_tls(args) → int         CC=1    pure ▶
@@ -35,12 +46,12 @@ PIPELINES[8] (Refactor:8):
               PURITY: 3/5 pure  BOTTLENECK: _format_text(CC=9)
 
   Src [Refactor]: args → tuple[int, int, int]
-              → _dispatch_doctor(args) → int            CC=1    pure ▶
-              → cmd_doctor(args) → int                  CC=8    IO
+              → _dispatch_drift(args) → int             CC=1    pure ▶
+              → cmd_drift(args) → int                   CC=3    pure
               → output_issues(issues:list[Issue], fmt:str) → None CC=2    IO
               → _format_text(issues:list[Issue]) → str  CC=9    mutation
               → _summarize(issues:list[Issue]) → tuple[int, int, int] CC=7    pure ■
-              PURITY: 2/5 pure  BOTTLENECK: _format_text(CC=9)
+              PURITY: 3/5 pure  BOTTLENECK: _format_text(CC=9)
 
   Src [Refactor]: list[int] → bool
               → check_ports(ports:list[int]) → list[Issue] CC=2    mutation ▶
@@ -63,15 +74,79 @@ PIPELINES[8] (Refactor:8):
 
 
 TRANSFORMS (fan-out ≥10):
-  main(argv:list[str] | None) → int                       fan=14   !! script-in-disguise
-  check_certificate(domain:str, port:int, warn_days:int) → list[Issue] fan=13   fan=13
+  check_untracked_files(readme_path:str | Path, extracted_dir:str | Path) → list[Issue] fan=18   fan=18
+  check_file_drift(readme_path:str | Path, extracted_dir:str | Path) → list[Issue] fan=16   fan=16
+  main(argv:list[str] | None) → int                       fan=15   !! script-in-disguise
   check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue] fan=12   fan=12
   scan_deploy_dir(deploy_dir:str, globs:tuple[str, Ellipsis]) → list[Issue] fan=12   fan=12
-  check_placeholders(paths:list[str]) → list[Issue]       fan=10   fan=10
   check_http_endpoint(name:str, url:str, expected_status:int, timeout:int, retries:int) → HealthCheckResult fan=10   fan=10
+  check_placeholders(paths:list[str]) → list[Issue]       fan=10   fan=10
   cmd_fix(args) → int                                     fan=10   fan=10
 
 CONTRACTS:
+  Pipeline: Src
+    _dispatch_check(args) → int
+      IN:  args
+      OUT: int
+      INVARIANT: raises on invalid input
+
+    cmd_check(args) → int
+      IN:  args
+      OUT: int
+      INVARIANT: raises on invalid input
+
+    check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue]
+      IN:  ctx:HostContext, domains:list[str] | None, containers:list[str] | None
+      OUT: list[Issue]
+      SIDE-EFFECT: pure
+      INVARIANT: raises on invalid input
+
+    check_certificates(domains:list[str], port:int, warn_days:int) → list[Issue]
+      IN:  domains:list[str], port:int, warn_days:int
+      OUT: list[Issue]
+      SIDE-EFFECT: pure
+      INVARIANT: raises on invalid input
+
+    check_certificate(domain:str, port:int, warn_days:int) → list[Issue]
+      IN:  domain:str, port:int, warn_days:int
+      OUT: list[Issue]
+      INVARIANT: raises on invalid input
+
+    _handle_connection_error(e:Exception, domain:str, port:int) → Issue
+      IN:  e:Exception, domain:str, port:int
+      OUT: Issue
+
+  Pipeline: Src
+    _dispatch_fix(args) → int
+      IN:  args
+      OUT: int
+
+    cmd_fix(args) → int
+      IN:  args
+      OUT: int
+      SIDE-EFFECT: IO(print)
+
+    check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue]
+      IN:  ctx:HostContext, domains:list[str] | None, containers:list[str] | None
+      OUT: list[Issue]
+      SIDE-EFFECT: pure
+      INVARIANT: raises on invalid input
+
+    check_certificates(domains:list[str], port:int, warn_days:int) → list[Issue]
+      IN:  domains:list[str], port:int, warn_days:int
+      OUT: list[Issue]
+      SIDE-EFFECT: pure
+      INVARIANT: raises on invalid input
+
+    check_certificate(domain:str, port:int, warn_days:int) → list[Issue]
+      IN:  domain:str, port:int, warn_days:int
+      OUT: list[Issue]
+      INVARIANT: raises on invalid input
+
+    _handle_connection_error(e:Exception, domain:str, port:int) → Issue
+      IN:  e:Exception, domain:str, port:int
+      OUT: Issue
+
   Pipeline: Src
     _dispatch_validate(args) → int
       IN:  args
@@ -105,53 +180,35 @@ CONTRACTS:
       SIDE-EFFECT: pure
 
   Pipeline: Src
-    _dispatch_check(args) → int
+    _dispatch_doctor(args) → int
       IN:  args
       OUT: int
-      INVARIANT: raises on invalid input
 
-    cmd_check(args) → int
+    cmd_doctor(args) → int
       IN:  args
       OUT: int
-      INVARIANT: raises on invalid input
-
-    output_issues(issues:list[Issue], fmt:str) → None
-      IN:  issues:list[Issue], fmt:str
-      OUT: None
       SIDE-EFFECT: IO(print, print)
 
-    _format_text(issues:list[Issue]) → str
-      IN:  issues:list[Issue]
-      OUT: str
+    check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue]
+      IN:  ctx:HostContext, domains:list[str] | None, containers:list[str] | None
+      OUT: list[Issue]
       SIDE-EFFECT: pure
+      INVARIANT: raises on invalid input
 
-    _summarize(issues:list[Issue]) → tuple[int, int, int]
-      IN:  issues:list[Issue]
-      OUT: tuple[int, int, int]
-
-  Pipeline: Src
-    _dispatch_fix(args) → int
-      IN:  args
-      OUT: int
-
-    cmd_fix(args) → int
-      IN:  args
-      OUT: int
-      SIDE-EFFECT: IO(print)
-
-    _apply_all(ctx:HostContext, fixable:list[Issue], auto:bool, interactive:bool) → list[bool]
-      IN:  ctx:HostContext, fixable:list[Issue], auto:bool, interactive:bool
-      OUT: list[bool]
+    check_certificates(domains:list[str], port:int, warn_days:int) → list[Issue]
+      IN:  domains:list[str], port:int, warn_days:int
+      OUT: list[Issue]
       SIDE-EFFECT: pure
+      INVARIANT: raises on invalid input
 
-    _apply_single(ctx:HostContext, issue:Issue) → bool
-      IN:  ctx:HostContext, issue:Issue
-      OUT: bool
-      SIDE-EFFECT: IO(print, print, print)
+    check_certificate(domain:str, port:int, warn_days:int) → list[Issue]
+      IN:  domain:str, port:int, warn_days:int
+      OUT: list[Issue]
+      INVARIANT: raises on invalid input
 
-    run_remote(ctx:HostContext, command:str, timeout:int | None) → RemoteResult
-      IN:  ctx:HostContext, command:str, timeout:int | None
-      OUT: RemoteResult
+    _handle_connection_error(e:Exception, domain:str, port:int) → Issue
+      IN:  e:Exception, domain:str, port:int
+      OUT: Issue
 
   Pipeline: Src
     _dispatch_check_tls(args) → int
@@ -179,14 +236,13 @@ CONTRACTS:
       OUT: tuple[int, int, int]
 
   Pipeline: Src
-    _dispatch_doctor(args) → int
+    _dispatch_drift(args) → int
       IN:  args
       OUT: int
 
-    cmd_doctor(args) → int
+    cmd_drift(args) → int
       IN:  args
       OUT: int
-      SIDE-EFFECT: IO(print, print)
 
     output_issues(issues:list[Issue], fmt:str) → None
       IN:  issues:list[Issue], fmt:str
@@ -254,32 +310,32 @@ CONTRACTS:
       OUT: RemoteResult
 
 
-DATA_TYPES (by cross-function usage) [75 annotated, 0 inferred / 75 functions]:
-  str                  consumed:32  produced:8    !! HUB-TYPE → split interface
-  int                  consumed:26  produced:11   !! HUB-TYPE → split interface
-  list[Issue]          consumed:7   produced:26 
+DATA_TYPES (by cross-function usage) [85 annotated, 0 inferred / 85 functions]:
+  str                  consumed:38  produced:9    !! HUB-TYPE → split interface
+  int                  consumed:29  produced:13   !! HUB-TYPE → split interface
+  list[Issue]          consumed:7   produced:30 
   HostContext          consumed:27  produced:0    !! HUB-TYPE → split interface
   list[str]            consumed:10  produced:0    !! HUB-TYPE → split interface
   bool                 consumed:3   produced:5  
   FixResult            consumed:0   produced:6    output-heavy
   list[str] | None     consumed:5   produced:0    input-heavy (read-only flow)
+  str | Path           consumed:4   produced:0    narrow scope
+  Issue                consumed:2   produced:2    narrow scope
   HealthCheckResult    consumed:0   produced:4    narrow scope
   str | None           consumed:2   produced:1    narrow scope
   int | None           consumed:2   produced:1    narrow scope
-  Issue                consumed:2   produced:1    narrow scope
-  RemoteResult         consumed:0   produced:2    narrow scope
   list[bool]           consumed:1   produced:1    narrow scope
-  list[re.Pattern]     consumed:2   produced:0    narrow scope
   Path                 consumed:2   produced:0    narrow scope
-  dict[str, list[Issue]] consumed:0   produced:1    narrow scope
-  tuple[str, Ellipsis] consumed:1   produced:0    narrow scope
-  list[FixResult]      consumed:0   produced:1    narrow scope
+  list[re.Pattern]     consumed:2   produced:0    narrow scope
+  RemoteResult         consumed:0   produced:2    narrow scope
+  dict                 consumed:2   produced:0    narrow scope
+  dict | None          consumed:0   produced:1    narrow scope
   tuple[int, int, int] consumed:0   produced:1    narrow scope
 
   HUB TYPES (consumed ≥10):
-    str → 32 consumers → split into:
+    str → 38 consumers → split into:
       - (analyze consumers to suggest sub-interfaces)
-    int → 26 consumers → split into:
+    int → 29 consumers → split into:
       - (analyze consumers to suggest sub-interfaces)
     HostContext → 27 consumers → split into:
       - (analyze consumers to suggest sub-interfaces)
@@ -287,16 +343,17 @@ DATA_TYPES (by cross-function usage) [75 annotated, 0 inferred / 75 functions]:
       - (analyze consumers to suggest sub-interfaces)
 
 SIDE_EFFECTS:
-  IO:        generate_container_resolv_conf, _scan_file_for_vars, check_placeholders, output_issues, _format_json, main, cmd_fix, _confirm_fix, _apply_single, _report_fixes
-  Mutation:  check_port, check_ports, check_all, _get_compiled_patterns, classify_error, check_runtime, check_containers_running, check_disk_usage, check_memory, check_ufw_forward_policy
-  Pure:      is_port_free, find_free_port_near, who_uses_port, is_container_process, get_tip_for_failure, extract_missing_binary, _truncate, fix_ufw_allow_routed, fix_nat_masquerade, fix_resolv_conf
+  IO:        check_file_drift, check_untracked_files, generate_container_resolv_conf, _scan_file_for_vars, check_placeholders, output_issues, _format_json, cmd_fix, _confirm_fix, _apply_single
+  Mutation:  check_ufw_forward_policy, check_nat_masquerade, _get_compiled_patterns, classify_error, check_port, check_ports, check_runtime, check_containers_running, check_disk_usage, check_memory
+  Pure:      fix_ufw_allow_routed, fix_nat_masquerade, get_tip_for_failure, extract_missing_binary, _truncate, is_port_free, find_free_port_near, who_uses_port, is_container_process, _extract_blocks
 
   PIPELINE PURITY:
+    Src             ██░░ 66% pure
+    Src             ██░░ 50% pure
     Src             █░░░ 33% pure
+    Src             ██░░ 50% pure
     Src             ██░░ 60% pure
-    Src             █░░░ 40% pure
     Src             ██░░ 60% pure
-    Src             █░░░ 40% pure
     Src             ██░░ 50% pure
     Src             ██░░ 66% pure
     Src             ██░░ 66% pure

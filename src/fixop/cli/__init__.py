@@ -5,6 +5,7 @@ Usage:
     fixop fix --host myserver.com [--auto | --interactive]
     fixop validate deploy/
     fixop check-tls domain1.com domain2.com
+    fixop drift README.md sandbox/
     fixop check --host myserver.com --format json
 """
 
@@ -58,6 +59,14 @@ def main(argv: list[str] | None = None) -> int:
     tls_p.add_argument("--port", type=int, default=443, help="TLS port (default: 443)")
     tls_p.add_argument("--format", choices=["text", "json"], default="text", help="Output format")
 
+    # ── drift ──
+    drift_p = sub.add_parser("drift", help="Check file drift between README markpact blocks and disk")
+    drift_p.add_argument("readme", nargs="?", default="README.md", help="Path to README.md (default: README.md)")
+    drift_p.add_argument("source_dir", nargs="?", default="sandbox/", help="Source directory (default: sandbox/)")
+    drift_p.add_argument("--ignore-whitespace", action="store_true", help="Ignore trailing whitespace differences")
+    drift_p.add_argument("--untracked", action="store_true", help="Also report untracked files")
+    drift_p.add_argument("--format", choices=["text", "json"], default="text", help="Output format")
+
     # ── doctor ──
     doc_p = sub.add_parser("doctor", help="Full diagnostic + fix pipeline")
     doc_p.add_argument("--host", required=True, help="Remote host")
@@ -84,6 +93,7 @@ def main(argv: list[str] | None = None) -> int:
         "fix": _dispatch_fix,
         "validate": _dispatch_validate,
         "check-tls": _dispatch_check_tls,
+        "drift": _dispatch_drift,
         "doctor": _dispatch_doctor,
     }
     handler = dispatch.get(args.command)
@@ -113,6 +123,11 @@ def _dispatch_validate(args) -> int:
 def _dispatch_check_tls(args) -> int:
     from .validate_cmd import cmd_check_tls
     return cmd_check_tls(args)
+
+
+def _dispatch_drift(args) -> int:
+    from .drift_cmd import cmd_drift
+    return cmd_drift(args)
 
 
 def _dispatch_doctor(args) -> int:

@@ -4,16 +4,20 @@
 
 - **Project**: /home/tom/github/wronai/fixop
 - **Analysis Mode**: static
-- **Total Functions**: 75
+- **Total Functions**: 85
 - **Total Classes**: 9
-- **Modules**: 18
-- **Entry Points**: 28
+- **Modules**: 20
+- **Entry Points**: 29
 
 ## Architecture by Module
 
 ### src.fixop.cli
-- **Functions**: 7
+- **Functions**: 8
 - **File**: `__init__.py`
+
+### src.fixop.tls
+- **Functions**: 7
+- **File**: `tls.py`
 
 ### src.fixop.ports
 - **Functions**: 6
@@ -48,17 +52,17 @@
 - **Functions**: 5
 - **File**: `output.py`
 
-### src.fixop.containers
-- **Functions**: 4
-- **File**: `containers.py`
-
 ### src.fixop.firewall
 - **Functions**: 4
 - **File**: `firewall.py`
 
-### src.fixop.tls
-- **Functions**: 3
-- **File**: `tls.py`
+### src.fixop.containers
+- **Functions**: 4
+- **File**: `containers.py`
+
+### src.fixop.drift
+- **Functions**: 4
+- **File**: `drift.py`
 
 ### src.fixop.cli.check_cmd
 - **Functions**: 3
@@ -69,6 +73,11 @@
 - **Classes**: 6
 - **File**: `models.py`
 
+### src.fixop.transport
+- **Functions**: 2
+- **Classes**: 1
+- **File**: `transport.py`
+
 ### src.fixop.ssh
 - **Functions**: 2
 - **File**: `ssh.py`
@@ -77,14 +86,13 @@
 - **Functions**: 2
 - **File**: `validate_cmd.py`
 
-### src.fixop.transport
-- **Functions**: 2
-- **Classes**: 1
-- **File**: `transport.py`
-
 ### src.fixop
 - **Functions**: 1
 - **File**: `__init__.py`
+
+### src.fixop.cli.drift_cmd
+- **Functions**: 1
+- **File**: `drift_cmd.py`
 
 ## Key Entry Points
 
@@ -141,10 +149,6 @@ Args:
 Quadlet files in /etc/containers/systemd/ are auto-converted to systemd units.
 - **Calls**: src.fixop.transport.run_remote, src.fixop.transport.run_remote, issues.append, issues.append, Issue, Issue
 
-### src.fixop.classify.extract_missing_binary
-> Extract binary name from 'command not found' stderr.
-- **Calls**: stderr.splitlines, line.lower, line.split, len, None.strip
-
 ### src.fixop.firewall.fix_ufw_allow_routed
 > Set UFW DEFAULT_FORWARD_POLICY to ACCEPT and reload.
 - **Calls**: src.fixop.transport.run_remote, Issue, FixResult, result.stdout.strip, result.stderr.strip
@@ -152,6 +156,10 @@ Quadlet files in /etc/containers/systemd/ are auto-converted to systemd units.
 ### src.fixop.firewall.fix_nat_masquerade
 > Add iptables NAT masquerade rule for container subnet.
 - **Calls**: src.fixop.transport.run_remote, Issue, FixResult, result.stdout.strip, result.stderr.strip
+
+### src.fixop.classify.extract_missing_binary
+> Extract binary name from 'command not found' stderr.
+- **Calls**: stderr.splitlines, line.lower, line.split, len, None.strip
 
 ### src.fixop.dns.fix_disable_systemd_resolved
 > Stop and disable systemd-resolved, then set static resolv.conf.
@@ -214,6 +222,9 @@ Extracted from: taskfile/runner/commands.py (_get_tip_for_failure)
 ### src.fixop.cli._dispatch_check_tls
 - **Calls**: src.fixop.cli.validate_cmd.cmd_check_tls
 
+### src.fixop.cli._dispatch_drift
+- **Calls**: src.fixop.cli.drift_cmd.cmd_drift
+
 ### src.fixop.cli._dispatch_doctor
 - **Calls**: src.fixop.cli.check_cmd.cmd_doctor
 
@@ -274,14 +285,15 @@ check_quadlet_loaded [src.fixop.systemd]
   └─ →> run_remote
 ```
 
-### Flow 9: extract_missing_binary
-```
-extract_missing_binary [src.fixop.classify]
-```
-
-### Flow 10: fix_ufw_allow_routed
+### Flow 9: fix_ufw_allow_routed
 ```
 fix_ufw_allow_routed [src.fixop.firewall]
+  └─ →> run_remote
+```
+
+### Flow 10: fix_nat_masquerade
+```
+fix_nat_masquerade [src.fixop.firewall]
   └─ →> run_remote
 ```
 
@@ -336,6 +348,14 @@ Key functions that process and transform data:
 > Check if a process name belongs to a container runtime.
 - **Output to**: any, process_name.lower
 
+### src.fixop.tls._validate_expiry
+> Check certificate expiry. Returns issues for expired or soon-expiring certs.
+- **Output to**: cert.get, None.replace, datetime.strptime, datetime.now, Issue
+
+### src.fixop.tls._validate_issuer
+> Check if certificate is self-signed.
+- **Output to**: dict, dict, Issue, cert.get, cert.get
+
 ### src.fixop.cli.output._format_json
 > Serialize issues to JSON string.
 - **Output to**: json.dumps
@@ -355,9 +375,10 @@ Key functions that process and transform data:
 
 Functions exposed as public API (no underscore prefix):
 
-- `src.fixop.cli.main` - 40 calls
-- `src.fixop.tls.check_certificate` - 34 calls
+- `src.fixop.cli.main` - 46 calls
+- `src.fixop.drift.check_file_drift` - 26 calls
 - `src.fixop.check_all` - 22 calls
+- `src.fixop.drift.check_untracked_files` - 21 calls
 - `src.fixop.health.check_http_endpoint` - 20 calls
 - `src.fixop.ssh.check_ssh_connectivity` - 19 calls
 - `src.fixop.systemd.graceful_restart` - 18 calls
@@ -367,8 +388,8 @@ Functions exposed as public API (no underscore prefix):
 - `src.fixop.systemd.check_unit_status` - 13 calls
 - `src.fixop.containers.check_containers_running` - 12 calls
 - `src.fixop.dns.check_container_dns` - 11 calls
-- `src.fixop.deploy.check_placeholders` - 11 calls
 - `src.fixop.health.check_ssh_service` - 11 calls
+- `src.fixop.deploy.check_placeholders` - 11 calls
 - `src.fixop.ssh.check_ssh_key` - 11 calls
 - `src.fixop.cli.fix_cmd.cmd_fix` - 10 calls
 - `src.fixop.cli.check_cmd.cmd_check` - 9 calls
@@ -384,17 +405,16 @@ Functions exposed as public API (no underscore prefix):
 - `src.fixop.transport.test_ssh_connection` - 7 calls
 - `src.fixop.ports.check_port` - 6 calls
 - `src.fixop.systemd.check_quadlet_loaded` - 6 calls
-- `src.fixop.ports.find_free_port_near` - 5 calls
-- `src.fixop.classify.extract_missing_binary` - 5 calls
 - `src.fixop.firewall.fix_ufw_allow_routed` - 5 calls
 - `src.fixop.firewall.fix_nat_masquerade` - 5 calls
+- `src.fixop.classify.extract_missing_binary` - 5 calls
+- `src.fixop.ports.find_free_port_near` - 5 calls
 - `src.fixop.dns.check_systemd_resolved` - 5 calls
 - `src.fixop.dns.fix_disable_systemd_resolved` - 5 calls
 - `src.fixop.dns.generate_container_resolv_conf` - 5 calls
 - `src.fixop.deploy.check_unresolved_vars` - 5 calls
 - `src.fixop.deploy.check_files_exist` - 5 calls
-- `src.fixop.systemd.daemon_reload` - 5 calls
-- `src.fixop.firewall.check_nat_masquerade` - 4 calls
+- `src.fixop.tls.check_certificate` - 5 calls
 
 ## System Interactions
 
@@ -431,7 +451,7 @@ graph TD
     check_quadlet_loaded --> run_remote
     check_quadlet_loaded --> append
     check_quadlet_loaded --> Issue
-    extract_missing_bina --> splitlines
+    fix_ufw_allow_routed --> run_remote
 ```
 
 ## Reverse Engineering Guidelines

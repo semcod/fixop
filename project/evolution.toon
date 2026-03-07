@@ -1,15 +1,15 @@
-# code2llm/evolution | 75 func | 18f | 2026-03-07
+# code2llm/evolution | 85 func | 20f | 2026-03-07
 
 NEXT[0]: no refactoring needed
 
 RISKS[0]: none
 
 METRICS-TARGET:
-  CC̄:          4.5 → ≤3.1
-  max-CC:      13 → ≤6
+  CC̄:          4.3 → ≤3.0
+  max-CC:      11 → ≤5
   god-modules: 0 → 0
   high-CC(≥15): 0 → ≤0
   hub-types:   0 → ≤0
 
 HISTORY:
-  prev CC̄=4.5 → now CC̄=4.5
+  prev CC̄=4.3 → now CC̄=4.3

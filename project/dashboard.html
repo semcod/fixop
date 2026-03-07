@@ -60,12 +60,12 @@
 </p>
 
 <div class="grid">
-  <div class="card"><div class="value">4.5</div><div class="label">Avg CC</div></div>
-  <div class="card"><div class="value">6</div><div class="label">Critical (CC≥10)</div></div>
-  <div class="card"><div class="value">75</div><div class="label">Functions</div></div>
+  <div class="card"><div class="value">4.3</div><div class="label">Avg CC</div></div>
+  <div class="card"><div class="value">7</div><div class="label">Critical (CC≥10)</div></div>
+  <div class="card"><div class="value">85</div><div class="label">Functions</div></div>
   <div class="card"><div class="value">9</div><div class="label">Classes</div></div>
-  <div class="card"><div class="value">18</div><div class="label">Files</div></div>
-  <div class="card"><div class="value">3233</div><div class="label">Lines</div></div>
+  <div class="card"><div class="value">20</div><div class="label">Files</div></div>
+  <div class="card"><div class="value">3726</div><div class="label">Lines</div></div>
   <div class="card"><div class="value">0</div><div class="label">Duplicates</div></div>
   <div class="card"><div class="value">0</div><div class="label">Cycles</div></div>
 </div>
@@ -74,9 +74,9 @@
   <div class="chart-container">
     <h2 style="border:none;margin:0 0 .5rem;">Evolution (2026-03-07)</h2>
     <div class="evo-cards">
-      <div class="card"><div class="value">4.5</div><div class="label">CC̄ →</div></div>
-      <div class="card"><div class="value">6</div><div class="label">Critical →</div></div>
-      <div class="card"><div class="value">3233</div><div class="label">Lines</div></div>
+      <div class="card"><div class="value">4.3</div><div class="label">CC̄ →</div></div>
+      <div class="card"><div class="value">7</div><div class="label">Critical →</div></div>
+      <div class="card"><div class="value">3726</div><div class="label">Lines</div></div>
     </div>
     <p class="trend" style="margin-top:.5rem;">Run analysis multiple times to build a trend chart (≥3 data points needed).</p>
   </div>
@@ -86,23 +86,30 @@
   </div>
 </div>
 
-<h2>Alerts (7)</h2>
+<h2>Alerts (8)</h2>
 <div class="card"><div class="table-wrap">
 <table>
   <thead><tr><th>Severity</th><th>Target</th><th>Type</th><th>Value</th><th>Limit</th></tr></thead>
   <tbody>
-            <tr class="warning">
-                <td><span class="badge warning">warning</span></td>
-                <td>main</td>
+            <tr class="error">
+                <td><span class="badge error">error</span></td>
+                <td>check_untracked_files</td>
                 <td>high_fan_out</td>
-                <td>14</td>
+                <td>18</td>
                 <td>10</td>
             </tr>
-            <tr class="warning">
-                <td><span class="badge warning">warning</span></td>
-                <td>check_certificate</td>
+            <tr class="error">
+                <td><span class="badge error">error</span></td>
+                <td>check_file_drift</td>
                 <td>high_fan_out</td>
-                <td>13</td>
+                <td>16</td>
+                <td>10</td>
+            </tr>
+            <tr class="error">
+                <td><span class="badge error">error</span></td>
+                <td>main</td>
+                <td>high_fan_out</td>
+                <td>15</td>
                 <td>10</td>
             </tr>
             <tr class="warning">
@@ -121,14 +128,14 @@
             </tr>
             <tr class="warning">
                 <td><span class="badge warning">warning</span></td>
-                <td>check_placeholders</td>
+                <td>check_http_endpoint</td>
                 <td>high_fan_out</td>
                 <td>10</td>
                 <td>10</td>
             </tr>
             <tr class="warning">
                 <td><span class="badge warning">warning</span></td>
-                <td>check_http_endpoint</td>
+                <td>check_placeholders</td>
                 <td>high_fan_out</td>
                 <td>10</td>
                 <td>10</td>
@@ -145,23 +152,31 @@
 
 <div class="two-col">
 <div>
-<h2>Hotspots (7)</h2>
+<h2>Hotspots (8)</h2>
 <div class="card"><div class="table-wrap">
 <table>
   <thead><tr><th>Function</th><th>Fan-out</th><th>Note</th></tr></thead>
   <tbody>
             <tr>
-                <td><strong>main</strong></td>
-                <td>14</td>
-                <td>Main CLI entry point.</td>
-            </tr>
-            <tr>
-                <td><strong>check_certificate</strong></td>
-                <td>13</td>
-                <td>Check if domain has a valid TLS certificate.
+                <td><strong>check_untracked_files</strong></td>
+                <td>18</td>
+                <td>Find files in extracted_dir not tracked by any markpact:file block.
 
 Args:
-    domain: Domain name to c</td>
+    r</td>
+            </tr>
+            <tr>
+                <td><strong>check_file_drift</strong></td>
+                <td>16</td>
+                <td>Compare markpact:file blocks in README against files on disk.
+
+Reports:
+- DRIFTE</td>
+            </tr>
+            <tr>
+                <td><strong>main</strong></td>
+                <td>15</td>
+                <td>Main CLI entry point.</td>
             </tr>
             <tr>
                 <td><strong>check_all</strong></td>
@@ -179,13 +194,6 @@ Args:
 Combines check_unresolved_vars +</td>
             </tr>
             <tr>
-                <td><strong>check_placeholders</strong></td>
-                <td>10</td>
-                <td>Detect placeholder values in deploy files (example.com, changeme, your-*).
-
-Args</td>
-            </tr>
-            <tr>
                 <td><strong>check_http_endpoint</strong></td>
                 <td>10</td>
                 <td>Check HTTP endpoint health.
@@ -193,6 +201,13 @@ Args</td>
 Args:
     name: Service name for display.
     url: </td>
+            </tr>
+            <tr>
+                <td><strong>check_placeholders</strong></td>
+                <td>10</td>
+                <td>Detect placeholder values in deploy files (example.com, changeme, your-*).
+
+Args</td>
             </tr>
             <tr>
                 <td><strong>cmd_fix</strong></td>
@@ -204,17 +219,35 @@ Args:
 </div>
 
 <div>
-<h2>Refactoring Priorities (0)</h2>
+<h2>Refactoring Priorities (3)</h2>
 <div class="card"><div class="table-wrap">
 <table>
   <thead><tr><th>#</th><th>Action</th><th>Impact</th><th>Effort</th></tr></thead>
-  <tbody><tr><td colspan="4" style="color:var(--muted)">No refactoring needed</td></tr></tbody>
+  <tbody>
+            <tr>
+                <td>1</td>
+                <td>Reduce check_untracked_files fan-out (currently 18)</td>
+                <td><span class="badge medium">medium</span></td>
+                <td>medium</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Reduce check_file_drift fan-out (currently 16)</td>
+                <td><span class="badge medium">medium</span></td>
+                <td>medium</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Reduce main fan-out (currently 15)</td>
+                <td><span class="badge medium">medium</span></td>
+                <td>medium</td>
+            </tr></tbody>
 </table>
 </div></div>
 </div>
 </div>
 
-<footer>Generated by code2llm on 2026-03-07 17:35</footer>
+<footer>Generated by code2llm on 2026-03-07 18:31</footer>
 
 <script>
 // Evolution chart disabled — fewer than 3 data points
@@ -223,9 +256,9 @@ const modCtx = document.getElementById('modChart').getContext('2d');
 new Chart(modCtx, {
   type: 'bar',
   data: {
-    labels: ['tls.py', 'health.py', 'classify.py', 'systemd.py', 'check_cmd.py', 'output.py', 'dns.py', 'ssh.py', 'deploy.py', '__init__.py', 'containers.py', 'ports.py', 'fix_cmd.py', 'firewall.py', '__init__.py'],
-    datasets: [{ label: 'Max CC', data: [13, 11, 10, 10, 9, 9, 9, 9, 8, 7, 7, 7, 6, 5, 4],
-      backgroundColor: [13, 11, 10, 10, 9, 9, 9, 9, 8, 7, 7, 7, 6, 5, 4].map(v => v >= 15 ? '#ef4444' : v >= 10 ? '#eab308' : '#22c55e')
+    labels: ['drift.py', 'health.py', 'classify.py', 'systemd.py', 'tls.py', 'check_cmd.py', 'output.py', 'dns.py', 'ssh.py', 'deploy.py', '__init__.py', 'containers.py', 'ports.py', 'fix_cmd.py', 'firewall.py'],
+    datasets: [{ label: 'Max CC', data: [11, 11, 10, 10, 10, 9, 9, 9, 9, 8, 7, 7, 7, 6, 5],
+      backgroundColor: [11, 11, 10, 10, 10, 9, 9, 9, 9, 8, 7, 7, 7, 6, 5].map(v => v >= 15 ? '#ef4444' : v >= 10 ? '#eab308' : '#22c55e')
     }]
   },
   options: {

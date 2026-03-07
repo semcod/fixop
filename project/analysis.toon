@@ -1,5 +1,5 @@
-# code2llm | 18f 2436L | py:18 | 2026-03-07
-# CC̄=4.5 | critical:6/75 | dups:0 | cycles:0
+# code2llm | 20f 2686L | py:20 | 2026-03-07
+# CC̄=4.3 | critical:7/85 | dups:0 | cycles:0
 
 HEALTH[0]: ok
 
@@ -14,52 +14,55 @@ COUPLING:
   SMELL: src/ fan-out=11 → split needed
 
 LAYERS:
-  src/                            CC̄=4.5    ←in:3  →out:11  !! split
+  src/                            CC̄=4.3    ←in:3  →out:11  !! split
   │ !  health                     245L  2C    5m  CC=11     ←0
   │ deploy                     207L  0C    6m  CC=8      ←1
   │ !  systemd                    206L  0C    5m  CC=10     ←1
+  │ !  drift                      194L  0C    4m  CC=11     ←1
   │ dns                        194L  0C    6m  CC=9      ←1
-  │ !  tls                        185L  0C    3m  CC=13     ←2
+  │ !  tls                        192L  0C    7m  CC=10     ←2
   │ containers                 170L  0C    4m  CC=7      ←1
   │ !  classify                   161L  0C    5m  CC=10     ←0
   │ ssh                        139L  0C    2m  CC=9      ←1
-  │ __init__                   124L  0C    7m  CC=4      ←0
+  │ __init__                   139L  0C    8m  CC=4      ←0
   │ firewall                   118L  0C    4m  CC=5      ←1
-  │ __init__                   113L  0C    1m  CC=7      ←2
+  │ __init__                   116L  0C    1m  CC=7      ←2
   │ ports                      112L  0C    6m  CC=7      ←0
   │ models                     103L  6C    3m  CC=2      ←0
   │ transport                  100L  1C    2m  CC=4      ←8
   │ fix_cmd                     82L  0C    6m  CC=6      ←1
-  │ output                      77L  0C    5m  CC=9      ←2
+  │ output                      77L  0C    5m  CC=9      ←3
   │ check_cmd                   73L  0C    3m  CC=9      ←1
+  │ drift_cmd                   31L  0C    1m  CC=3      ←1
   │ validate_cmd                27L  0C    2m  CC=3      ←1
   │
 
 DUPLICATES[0]: none
 
-FUNCTIONS (CC≥10, 6 of 75):
-   13.0  check_certificate                           3n   2exit  ret
+FUNCTIONS (CC≥10, 7 of 85):
+   11.0  check_untracked_files                      17n   3exit  loops+cond+ret
    11.0  check_http_endpoint                         4n   2exit  loops+ret
    10.0  classify_error                             14n   4exit  loops+cond+ret
-   10.0  check_acme_readiness                       14n   3exit  cond+ret
+   10.0  check_file_drift                           16n   4exit  loops+cond+ret
    10.0  run_health_checks                          10n   2exit  loops+cond+ret
+   10.0  check_acme_readiness                       14n   3exit  cond+ret
    10.0  check_unit_status                          10n   2exit  loops+cond+ret
 
   summary:
-    critical(≥10): 6 | high(5-10): 27 | medium(2-5): 28 | low(<2): 14
-    8% CC≥10  44% CC≥5
+    critical(≥10): 7 | high(5-10): 28 | medium(2-5): 33 | low(<2): 17
+    8% CC≥10  41% CC≥5
 
 HOTSPOTS:
-  #1  main                                 fan=14   "calls 14 functions"
-  #2  check_certificate                    fan=13   "calls 13 functions"
-  #3  check_all                            fan=12   "calls 12 functions"
-  #4  scan_deploy_dir                      fan=12   "calls 12 functions"
-  #5  check_placeholders                   fan=10   "calls 10 functions"
+  #1  check_untracked_files                fan=18   "calls 18 functions"
+  #2  check_file_drift                     fan=16   "calls 16 functions"
+  #3  main                                 fan=15   "calls 15 functions"
+  #4  check_all                            fan=12   "calls 12 functions"
+  #5  scan_deploy_dir                      fan=12   "calls 12 functions"
   #6  check_http_endpoint                  fan=10   "calls 10 functions"
-  #7  cmd_fix                              fan=10   "calls 10 functions"
-  #8  check_ssh_key                        fan=9    "calls 9 functions"
-  #9  _format_text                         fan=9    "9-way dispatch"
-  #10 cmd_check                            fan=9    "calls 9 functions"
+  #7  check_placeholders                   fan=10   "calls 10 functions"
+  #8  cmd_fix                              fan=10   "calls 10 functions"
+  #9  check_ssh_key                        fan=9    "calls 9 functions"
+  #10 _format_text                         fan=9    "9-way dispatch"
 
 CLASSES:
   Issue                          ████████████████████████   1m  CC̄=1.0   max=1   
@@ -73,11 +76,12 @@ CLASSES:
   FixStrategy                                               0m  CC̄=0.0   max=0.0 
 
 D:
-  src/fixop/tls.py:
-    e: check_certificate,check_certificates,check_acme_readiness
-    check_certificate(domain,port,warn_days)
-    check_certificates(domains,port,warn_days)
-    check_acme_readiness(ctx,container)
+  src/fixop/drift.py:
+    e: _extract_blocks,_sha256,check_file_drift,check_untracked_files
+    _extract_blocks(readme_text)
+    _sha256(content)
+    check_file_drift(readme_path,extracted_dir)
+    check_untracked_files(readme_path,extracted_dir)
   src/fixop/health.py:
     e: HealthCheckResult,HealthReport,check_http_endpoint,check_ssh_service,check_tcp_port,run_health_checks,_unhealthy
     HealthCheckResult  # Result of a single health check....
@@ -94,6 +98,15 @@ D:
     get_tip_for_failure(cmd,exit_code)
     extract_missing_binary(stderr)
     _truncate(s,max_len)
+  src/fixop/tls.py:
+    e: _connect_and_get_cert,_validate_expiry,_validate_issuer,_handle_connection_error,check_certificate,check_certificates,check_acme_readiness
+    _connect_and_get_cert(domain,port)
+    _validate_expiry(cert,domain,warn_days)
+    _validate_issuer(cert,domain)
+    _handle_connection_error(e,domain,port)
+    check_certificate(domain,port,warn_days)
+    check_certificates(domains,port,warn_days)
+    check_acme_readiness(ctx,container)
   src/fixop/systemd.py:
     e: check_unit_status,check_quadlet_loaded,daemon_reload,graceful_restart,graceful_restart_all
     check_unit_status(ctx,units)
@@ -141,15 +154,15 @@ D:
     is_container_process(process_name)
     check_port(port)
     check_ports(ports)
-  src/fixop/__init__.py:
-    e: check_all
-    check_all(ctx,domains,containers)
   src/fixop/containers.py:
     e: check_runtime,check_containers_running,check_disk_usage,check_memory
     check_runtime(ctx,runtime)
     check_containers_running(ctx,expected,runtime)
     check_disk_usage(ctx,warn_mb)
     check_memory(ctx,warn_percent)
+  src/fixop/__init__.py:
+    e: check_all
+    check_all(ctx,domains,containers)
   src/fixop/cli/fix_cmd.py:
     e: cmd_fix,_discover_fixable,_confirm_fix,_apply_single,_apply_all,_report_fixes
     cmd_fix(args)
@@ -164,20 +177,24 @@ D:
     check_nat_masquerade(ctx,subnet)
     fix_ufw_allow_routed(ctx)
     fix_nat_masquerade(ctx,subnet)
+  src/fixop/transport.py:
+    e: RemoteResult,run_remote,test_ssh_connection
+    RemoteResult  # Result of a remote command execution....
+    run_remote(ctx,command,timeout)
+    test_ssh_connection(ctx,timeout)
   src/fixop/cli/__init__.py:
-    e: main,_has_errors,_dispatch_check,_dispatch_fix,_dispatch_validate,_dispatch_check_tls,_dispatch_doctor
+    e: main,_has_errors,_dispatch_check,_dispatch_fix,_dispatch_validate,_dispatch_check_tls,_dispatch_drift,_dispatch_doctor
     main(argv)
     _has_errors(issues)
     _dispatch_check(args)
     _dispatch_fix(args)
     _dispatch_validate(args)
     _dispatch_check_tls(args)
+    _dispatch_drift(args)
     _dispatch_doctor(args)
-  src/fixop/transport.py:
-    e: RemoteResult,run_remote,test_ssh_connection
-    RemoteResult  # Result of a remote command execution....
-    run_remote(ctx,command,timeout)
-    test_ssh_connection(ctx,timeout)
+  src/fixop/cli/drift_cmd.py:
+    e: cmd_drift
+    cmd_drift(args)
   src/fixop/cli/validate_cmd.py:
     e: cmd_validate,cmd_check_tls
     cmd_validate(args)
