@@ -42,11 +42,11 @@ DUPLICATES[0]: none
 FUNCTIONS (CC≥10, 7 of 85):
    11.0  check_untracked_files                      17n   3exit  loops+cond+ret
    11.0  check_http_endpoint                         4n   2exit  loops+ret
-   10.0  classify_error                             14n   4exit  loops+cond+ret
    10.0  check_file_drift                           16n   4exit  loops+cond+ret
-   10.0  run_health_checks                          10n   2exit  loops+cond+ret
+   10.0  classify_error                             14n   4exit  loops+cond+ret
    10.0  check_acme_readiness                       14n   3exit  cond+ret
    10.0  check_unit_status                          10n   2exit  loops+cond+ret
+   10.0  run_health_checks                          10n   2exit  loops+cond+ret
 
   summary:
     critical(≥10): 7 | high(5-10): 28 | medium(2-5): 33 | low(<2): 17
@@ -58,9 +58,9 @@ HOTSPOTS:
   #3  main                                 fan=15   "calls 15 functions"
   #4  check_all                            fan=12   "calls 12 functions"
   #5  scan_deploy_dir                      fan=12   "calls 12 functions"
-  #6  check_http_endpoint                  fan=10   "calls 10 functions"
-  #7  check_placeholders                   fan=10   "calls 10 functions"
-  #8  cmd_fix                              fan=10   "calls 10 functions"
+  #6  check_placeholders                   fan=10   "calls 10 functions"
+  #7  cmd_fix                              fan=10   "calls 10 functions"
+  #8  check_http_endpoint                  fan=10   "calls 10 functions"
   #9  check_ssh_key                        fan=9    "calls 9 functions"
   #10 _format_text                         fan=9    "9-way dispatch"
 
@@ -68,9 +68,9 @@ CLASSES:
   Issue                          ████████████████████████   1m  CC̄=1.0   max=1   
   FixResult                      ████████████████████████   1m  CC̄=2.0   max=2   
   HostContext                    ████████████████████████   1m  CC̄=1.0   max=1   
+  RemoteResult                                              0m  CC̄=0.0   max=0.0 
   HealthCheckResult                                         0m  CC̄=0.0   max=0.0 
   HealthReport                                              0m  CC̄=0.0   max=0.0 
-  RemoteResult                                              0m  CC̄=0.0   max=0.0 
   Severity                                                  0m  CC̄=0.0   max=0.0 
   Category                                                  0m  CC̄=0.0   max=0.0 
   FixStrategy                                               0m  CC̄=0.0   max=0.0 
@@ -146,6 +146,15 @@ D:
     check_placeholders(paths)
     check_files_exist(file_patterns,base_dir)
     scan_deploy_dir(deploy_dir,globs)
+  src/fixop/__init__.py:
+    e: check_all
+    check_all(ctx,domains,containers)
+  src/fixop/containers.py:
+    e: check_runtime,check_containers_running,check_disk_usage,check_memory
+    check_runtime(ctx,runtime)
+    check_containers_running(ctx,expected,runtime)
+    check_disk_usage(ctx,warn_mb)
+    check_memory(ctx,warn_percent)
   src/fixop/ports.py:
     e: is_port_free,find_free_port_near,who_uses_port,is_container_process,check_port,check_ports
     is_port_free(port,host)
@@ -154,15 +163,6 @@ D:
     is_container_process(process_name)
     check_port(port)
     check_ports(ports)
-  src/fixop/containers.py:
-    e: check_runtime,check_containers_running,check_disk_usage,check_memory
-    check_runtime(ctx,runtime)
-    check_containers_running(ctx,expected,runtime)
-    check_disk_usage(ctx,warn_mb)
-    check_memory(ctx,warn_percent)
-  src/fixop/__init__.py:
-    e: check_all
-    check_all(ctx,domains,containers)
   src/fixop/cli/fix_cmd.py:
     e: cmd_fix,_discover_fixable,_confirm_fix,_apply_single,_apply_all,_report_fixes
     cmd_fix(args)
@@ -177,11 +177,6 @@ D:
     check_nat_masquerade(ctx,subnet)
     fix_ufw_allow_routed(ctx)
     fix_nat_masquerade(ctx,subnet)
-  src/fixop/transport.py:
-    e: RemoteResult,run_remote,test_ssh_connection
-    RemoteResult  # Result of a remote command execution....
-    run_remote(ctx,command,timeout)
-    test_ssh_connection(ctx,timeout)
   src/fixop/cli/__init__.py:
     e: main,_has_errors,_dispatch_check,_dispatch_fix,_dispatch_validate,_dispatch_check_tls,_dispatch_drift,_dispatch_doctor
     main(argv)
@@ -192,6 +187,11 @@ D:
     _dispatch_check_tls(args)
     _dispatch_drift(args)
     _dispatch_doctor(args)
+  src/fixop/transport.py:
+    e: RemoteResult,run_remote,test_ssh_connection
+    RemoteResult  # Result of a remote command execution....
+    run_remote(ctx,command,timeout)
+    test_ssh_connection(ctx,timeout)
   src/fixop/cli/drift_cmd.py:
     e: cmd_drift
     cmd_drift(args)

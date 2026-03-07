@@ -60,17 +60,17 @@ PIPELINES[9] (Refactor:9):
               → is_port_free(port:int, host:str) → bool CC=2    pure ■
               PURITY: 2/4 pure  BOTTLENECK: check_port(CC=7)
 
-  Src [Refactor]: HostContext → HealthCheckResult
-              → run_health_checks(ctx:HostContext, domains:list[str] | None, check_ssh:bool) → HealthReport CC=10   mutation ▶
-              → check_http_endpoint(name:str, url:str, expected_status:int, timeout:int, retries:int) → HealthCheckResult CC=11   pure
-              → _unhealthy(name:str, url:str, start:float, error:str, status_code:int | None) → HealthCheckResult CC=1    pure ■
-              PURITY: 2/3 pure  BOTTLENECK: check_http_endpoint(CC=11)
-
   Src [Refactor]: HostContext → RemoteResult
               → graceful_restart_all(ctx:HostContext, units:list[str], delay:int) → list[FixResult] CC=3    mutation ▶
               → graceful_restart(ctx:HostContext, unit:str, delay:int) → FixResult CC=6    pure
               → run_remote(ctx:HostContext, command:str, timeout:int | None) → RemoteResult CC=4    pure ■
               PURITY: 2/3 pure  BOTTLENECK: graceful_restart(CC=6)
+
+  Src [Refactor]: HostContext → HealthCheckResult
+              → run_health_checks(ctx:HostContext, domains:list[str] | None, check_ssh:bool) → HealthReport CC=10   mutation ▶
+              → check_http_endpoint(name:str, url:str, expected_status:int, timeout:int, retries:int) → HealthCheckResult CC=11   pure
+              → _unhealthy(name:str, url:str, start:float, error:str, status_code:int | None) → HealthCheckResult CC=1    pure ■
+              PURITY: 2/3 pure  BOTTLENECK: check_http_endpoint(CC=11)
 
 
 TRANSFORMS (fan-out ≥10):
@@ -79,9 +79,9 @@ TRANSFORMS (fan-out ≥10):
   main(argv:list[str] | None) → int                       fan=15   !! script-in-disguise
   check_all(ctx:HostContext, domains:list[str] | None, containers:list[str] | None) → list[Issue] fan=12   fan=12
   scan_deploy_dir(deploy_dir:str, globs:tuple[str, Ellipsis]) → list[Issue] fan=12   fan=12
-  check_http_endpoint(name:str, url:str, expected_status:int, timeout:int, retries:int) → HealthCheckResult fan=10   fan=10
   check_placeholders(paths:list[str]) → list[Issue]       fan=10   fan=10
   cmd_fix(args) → int                                     fan=10   fan=10
+  check_http_endpoint(name:str, url:str, expected_status:int, timeout:int, retries:int) → HealthCheckResult fan=10   fan=10
 
 CONTRACTS:
   Pipeline: Src
@@ -280,6 +280,20 @@ CONTRACTS:
       OUT: bool
 
   Pipeline: Src
+    graceful_restart_all(ctx:HostContext, units:list[str], delay:int) → list[FixResult]
+      IN:  ctx:HostContext, units:list[str], delay:int
+      OUT: list[FixResult]
+      SIDE-EFFECT: pure
+
+    graceful_restart(ctx:HostContext, unit:str, delay:int) → FixResult
+      IN:  ctx:HostContext, unit:str, delay:int
+      OUT: FixResult
+
+    run_remote(ctx:HostContext, command:str, timeout:int | None) → RemoteResult
+      IN:  ctx:HostContext, command:str, timeout:int | None
+      OUT: RemoteResult
+
+  Pipeline: Src
     run_health_checks(ctx:HostContext, domains:list[str] | None, check_ssh:bool) → HealthReport
       IN:  ctx:HostContext, domains:list[str] | None, check_ssh:bool
       OUT: HealthReport
@@ -295,20 +309,6 @@ CONTRACTS:
       IN:  name:str, url:str, start:float, error:str, status_code:int | None
       OUT: HealthCheckResult
 
-  Pipeline: Src
-    graceful_restart_all(ctx:HostContext, units:list[str], delay:int) → list[FixResult]
-      IN:  ctx:HostContext, units:list[str], delay:int
-      OUT: list[FixResult]
-      SIDE-EFFECT: pure
-
-    graceful_restart(ctx:HostContext, unit:str, delay:int) → FixResult
-      IN:  ctx:HostContext, unit:str, delay:int
-      OUT: FixResult
-
-    run_remote(ctx:HostContext, command:str, timeout:int | None) → RemoteResult
-      IN:  ctx:HostContext, command:str, timeout:int | None
-      OUT: RemoteResult
-
 
 DATA_TYPES (by cross-function usage) [85 annotated, 0 inferred / 85 functions]:
   str                  consumed:38  produced:9    !! HUB-TYPE → split interface
@@ -319,18 +319,18 @@ DATA_TYPES (by cross-function usage) [85 annotated, 0 inferred / 85 functions]:
   bool                 consumed:3   produced:5  
   FixResult            consumed:0   produced:6    output-heavy
   list[str] | None     consumed:5   produced:0    input-heavy (read-only flow)
-  str | Path           consumed:4   produced:0    narrow scope
   Issue                consumed:2   produced:2    narrow scope
   HealthCheckResult    consumed:0   produced:4    narrow scope
-  str | None           consumed:2   produced:1    narrow scope
+  str | Path           consumed:4   produced:0    narrow scope
   int | None           consumed:2   produced:1    narrow scope
+  str | None           consumed:2   produced:1    narrow scope
+  RemoteResult         consumed:0   produced:2    narrow scope
+  dict                 consumed:2   produced:0    narrow scope
   list[bool]           consumed:1   produced:1    narrow scope
   Path                 consumed:2   produced:0    narrow scope
   list[re.Pattern]     consumed:2   produced:0    narrow scope
-  RemoteResult         consumed:0   produced:2    narrow scope
-  dict                 consumed:2   produced:0    narrow scope
-  dict | None          consumed:0   produced:1    narrow scope
-  tuple[int, int, int] consumed:0   produced:1    narrow scope
+  list[tuple[re.Pattern, Category, str, Severity]] consumed:0   produced:1    narrow scope
+  list[int]            consumed:1   produced:0    narrow scope
 
   HUB TYPES (consumed ≥10):
     str → 38 consumers → split into:
@@ -343,9 +343,9 @@ DATA_TYPES (by cross-function usage) [85 annotated, 0 inferred / 85 functions]:
       - (analyze consumers to suggest sub-interfaces)
 
 SIDE_EFFECTS:
-  IO:        check_file_drift, check_untracked_files, generate_container_resolv_conf, _scan_file_for_vars, check_placeholders, output_issues, _format_json, cmd_fix, _confirm_fix, _apply_single
-  Mutation:  check_ufw_forward_policy, check_nat_masquerade, _get_compiled_patterns, classify_error, check_port, check_ports, check_runtime, check_containers_running, check_disk_usage, check_memory
-  Pure:      fix_ufw_allow_routed, fix_nat_masquerade, get_tip_for_failure, extract_missing_binary, _truncate, is_port_free, find_free_port_near, who_uses_port, is_container_process, _extract_blocks
+  IO:        check_file_drift, check_untracked_files, generate_container_resolv_conf, _scan_file_for_vars, check_placeholders, output_issues, _format_json, main, cmd_fix, _confirm_fix
+  Mutation:  _get_compiled_patterns, classify_error, check_all, check_runtime, check_containers_running, check_disk_usage, check_memory, check_ufw_forward_policy, check_nat_masquerade, check_port
+  Pure:      _extract_blocks, _sha256, get_tip_for_failure, extract_missing_binary, _truncate, fix_ufw_allow_routed, fix_nat_masquerade, is_port_free, find_free_port_near, who_uses_port
 
   PIPELINE PURITY:
     Src             ██░░ 66% pure

@@ -1,6 +1,6 @@
 [project]
 name = "fixop"
-version = "0.1.15"
+version = "0.1.16"
 description = "Infrastructure fix operations — detect and repair DNS, firewall, containers, TLS, systemd issues"
 readme = "README.md"
 license = "Apache-2.0"

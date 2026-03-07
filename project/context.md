@@ -39,11 +39,6 @@
 - **Functions**: 5
 - **File**: `classify.py`
 
-### src.fixop.health
-- **Functions**: 5
-- **Classes**: 2
-- **File**: `health.py`
-
 ### src.fixop.systemd
 - **Functions**: 5
 - **File**: `systemd.py`
@@ -52,17 +47,22 @@
 - **Functions**: 5
 - **File**: `output.py`
 
-### src.fixop.firewall
+### src.fixop.health
+- **Functions**: 5
+- **Classes**: 2
+- **File**: `health.py`
+
+### src.fixop.drift
 - **Functions**: 4
-- **File**: `firewall.py`
+- **File**: `drift.py`
 
 ### src.fixop.containers
 - **Functions**: 4
 - **File**: `containers.py`
 
-### src.fixop.drift
+### src.fixop.firewall
 - **Functions**: 4
-- **File**: `drift.py`
+- **File**: `firewall.py`
 
 ### src.fixop.cli.check_cmd
 - **Functions**: 3
@@ -73,11 +73,6 @@
 - **Classes**: 6
 - **File**: `models.py`
 
-### src.fixop.transport
-- **Functions**: 2
-- **Classes**: 1
-- **File**: `transport.py`
-
 ### src.fixop.ssh
 - **Functions**: 2
 - **File**: `ssh.py`
@@ -85,6 +80,11 @@
 ### src.fixop.cli.validate_cmd
 - **Functions**: 2
 - **File**: `validate_cmd.py`
+
+### src.fixop.transport
+- **Functions**: 2
+- **Classes**: 1
+- **File**: `transport.py`
 
 ### src.fixop
 - **Functions**: 1
@@ -149,6 +149,10 @@ Args:
 Quadlet files in /etc/containers/systemd/ are auto-converted to systemd units.
 - **Calls**: src.fixop.transport.run_remote, src.fixop.transport.run_remote, issues.append, issues.append, Issue, Issue
 
+### src.fixop.classify.extract_missing_binary
+> Extract binary name from 'command not found' stderr.
+- **Calls**: stderr.splitlines, line.lower, line.split, len, None.strip
+
 ### src.fixop.firewall.fix_ufw_allow_routed
 > Set UFW DEFAULT_FORWARD_POLICY to ACCEPT and reload.
 - **Calls**: src.fixop.transport.run_remote, Issue, FixResult, result.stdout.strip, result.stderr.strip
@@ -156,10 +160,6 @@ Quadlet files in /etc/containers/systemd/ are auto-converted to systemd units.
 ### src.fixop.firewall.fix_nat_masquerade
 > Add iptables NAT masquerade rule for container subnet.
 - **Calls**: src.fixop.transport.run_remote, Issue, FixResult, result.stdout.strip, result.stderr.strip
-
-### src.fixop.classify.extract_missing_binary
-> Extract binary name from 'command not found' stderr.
-- **Calls**: stderr.splitlines, line.lower, line.split, len, None.strip
 
 ### src.fixop.dns.fix_disable_systemd_resolved
 > Stop and disable systemd-resolved, then set static resolv.conf.
@@ -285,15 +285,14 @@ check_quadlet_loaded [src.fixop.systemd]
   └─ →> run_remote
 ```
 
-### Flow 9: fix_ufw_allow_routed
+### Flow 9: extract_missing_binary
 ```
-fix_ufw_allow_routed [src.fixop.firewall]
-  └─ →> run_remote
+extract_missing_binary [src.fixop.classify]
 ```
 
-### Flow 10: fix_nat_masquerade
+### Flow 10: fix_ufw_allow_routed
 ```
-fix_nat_masquerade [src.fixop.firewall]
+fix_ufw_allow_routed [src.fixop.firewall]
   └─ →> run_remote
 ```
 
@@ -304,15 +303,15 @@ fix_nat_masquerade [src.fixop.firewall]
 - **Methods**: 3
 - **Key Methods**: src.fixop.models.HostContext.ssh_cmd, src.fixop.models.HostContext.scp_cmd, src.fixop.models.HostContext.__str__
 
-### src.fixop.health.HealthReport
-> Aggregated health check report.
-- **Methods**: 2
-- **Key Methods**: src.fixop.health.HealthReport.healthy_count, src.fixop.health.HealthReport.unhealthy_count
-
 ### src.fixop.transport.RemoteResult
 > Result of a remote command execution.
 - **Methods**: 2
 - **Key Methods**: src.fixop.transport.RemoteResult.success, src.fixop.transport.RemoteResult.output
+
+### src.fixop.health.HealthReport
+> Aggregated health check report.
+- **Methods**: 2
+- **Key Methods**: src.fixop.health.HealthReport.healthy_count, src.fixop.health.HealthReport.unhealthy_count
 
 ### src.fixop.models.Issue
 > A detected infrastructure problem.
@@ -388,26 +387,26 @@ Functions exposed as public API (no underscore prefix):
 - `src.fixop.systemd.check_unit_status` - 13 calls
 - `src.fixop.containers.check_containers_running` - 12 calls
 - `src.fixop.dns.check_container_dns` - 11 calls
-- `src.fixop.health.check_ssh_service` - 11 calls
 - `src.fixop.deploy.check_placeholders` - 11 calls
 - `src.fixop.ssh.check_ssh_key` - 11 calls
+- `src.fixop.health.check_ssh_service` - 11 calls
 - `src.fixop.cli.fix_cmd.cmd_fix` - 10 calls
 - `src.fixop.cli.check_cmd.cmd_check` - 9 calls
 - `src.fixop.cli.check_cmd.cmd_doctor` - 9 calls
-- `src.fixop.ports.who_uses_port` - 8 calls
 - `src.fixop.containers.check_disk_usage` - 8 calls
 - `src.fixop.containers.check_memory` - 8 calls
+- `src.fixop.ports.who_uses_port` - 8 calls
 - `src.fixop.dns.check_host_dns` - 8 calls
 - `src.fixop.dns.fix_resolv_conf` - 8 calls
 - `src.fixop.firewall.check_ufw_forward_policy` - 7 calls
+- `src.fixop.transport.test_ssh_connection` - 7 calls
 - `src.fixop.health.check_tcp_port` - 7 calls
 - `src.fixop.health.run_health_checks` - 7 calls
-- `src.fixop.transport.test_ssh_connection` - 7 calls
 - `src.fixop.ports.check_port` - 6 calls
 - `src.fixop.systemd.check_quadlet_loaded` - 6 calls
+- `src.fixop.classify.extract_missing_binary` - 5 calls
 - `src.fixop.firewall.fix_ufw_allow_routed` - 5 calls
 - `src.fixop.firewall.fix_nat_masquerade` - 5 calls
-- `src.fixop.classify.extract_missing_binary` - 5 calls
 - `src.fixop.ports.find_free_port_near` - 5 calls
 - `src.fixop.dns.check_systemd_resolved` - 5 calls
 - `src.fixop.dns.fix_disable_systemd_resolved` - 5 calls
@@ -451,7 +450,7 @@ graph TD
     check_quadlet_loaded --> run_remote
     check_quadlet_loaded --> append
     check_quadlet_loaded --> Issue
-    fix_ufw_allow_routed --> run_remote
+    extract_missing_bina --> splitlines
 ```
 
 ## Reverse Engineering Guidelines

@@ -1,50 +1,41 @@
 flowchart TD
     subgraph src_fixop
-        src__fixop__firewall__check_ufw_forward_policy["check_ufw_forward_policy"]
-        src__fixop__firewall__check_nat_masquerade["check_nat_masquerade"]
-        src__fixop__firewall__fix_ufw_allow_routed["fix_ufw_allow_routed"]
-        src__fixop__firewall__fix_nat_masquerade["fix_nat_masquerade"]
+        src__fixop__drift___extract_blocks["_extract_blocks"]
+        src__fixop__drift___sha256["_sha256"]
+        src__fixop__drift__check_file_drift("check_file_drift CC=10")
+        src__fixop__drift__check_untracked_files("check_untracked_files CC=11")
         src__fixop__classify___get_compiled_patterns["_get_compiled_patterns"]
         src__fixop__classify__classify_error("classify_error CC=10")
         src__fixop__classify__get_tip_for_failure("get_tip_for_failure CC=9")
         src__fixop__classify__extract_missing_binary["extract_missing_binary"]
         src__fixop__classify___truncate["_truncate"]
+        src__fixop__check_all["check_all"]
+        src__fixop__containers__check_runtime["check_runtime"]
+        src__fixop__containers__check_containers_running["check_containers_running"]
+        src__fixop__containers__check_disk_usage["check_disk_usage"]
+        src__fixop__containers__check_memory["check_memory"]
+        src__fixop__firewall__check_ufw_forward_policy["check_ufw_forward_policy"]
+        src__fixop__firewall__check_nat_masquerade["check_nat_masquerade"]
+        src__fixop__firewall__fix_ufw_allow_routed["fix_ufw_allow_routed"]
+        src__fixop__firewall__fix_nat_masquerade["fix_nat_masquerade"]
         src__fixop__ports__is_port_free["is_port_free"]
         src__fixop__ports__find_free_port_near["find_free_port_near"]
         src__fixop__ports__who_uses_port["who_uses_port"]
         src__fixop__ports__is_container_process["is_container_process"]
         src__fixop__ports__check_port["check_port"]
         src__fixop__ports__check_ports["check_ports"]
-        src__fixop__containers__check_runtime["check_runtime"]
-        src__fixop__containers__check_containers_running["check_containers_running"]
-        src__fixop__containers__check_disk_usage["check_disk_usage"]
-        src__fixop__containers__check_memory["check_memory"]
-        src__fixop__drift___extract_blocks["_extract_blocks"]
-        src__fixop__drift___sha256["_sha256"]
-        src__fixop__drift__check_file_drift("check_file_drift CC=10")
-        src__fixop__drift__check_untracked_files("check_untracked_files CC=11")
         src__fixop__dns__check_host_dns["check_host_dns"]
         src__fixop__dns__check_container_dns("check_container_dns CC=9")
         src__fixop__dns__check_systemd_resolved["check_systemd_resolved"]
         src__fixop__dns__fix_resolv_conf["fix_resolv_conf"]
         src__fixop__dns__fix_disable_systemd_resolved["fix_disable_systemd_resolved"]
         src__fixop__dns__generate_container_resolv_conf["generate_container_resolv_conf"]
-        src__fixop__check_all["check_all"]
-        src__fixop__health__check_http_endpoint("check_http_endpoint CC=11")
-        src__fixop__health__check_ssh_service["check_ssh_service"]
-        src__fixop__health__check_tcp_port["check_tcp_port"]
-        src__fixop__health__run_health_checks("run_health_checks CC=10")
-        src__fixop__health___unhealthy["_unhealthy"]
         src__fixop__deploy___scan_line_for_vars["_scan_line_for_vars"]
         src__fixop__deploy___scan_file_for_vars["_scan_file_for_vars"]
         src__fixop__deploy__check_unresolved_vars["check_unresolved_vars"]
         src__fixop__deploy__check_placeholders("check_placeholders CC=8")
         src__fixop__deploy__check_files_exist["check_files_exist"]
         src__fixop__deploy__scan_deploy_dir["scan_deploy_dir"]
-        src__fixop__transport__run_remote["run_remote"]
-        src__fixop__transport__test_ssh_connection["test_ssh_connection"]
-        src__fixop__ssh__check_ssh_key["check_ssh_key"]
-        src__fixop__ssh__check_ssh_connectivity("check_ssh_connectivity CC=9")
         src__fixop__tls___connect_and_get_cert["_connect_and_get_cert"]
         src__fixop__tls___validate_expiry["_validate_expiry"]
         src__fixop__tls___validate_issuer["_validate_issuer"]
@@ -57,47 +48,52 @@ flowchart TD
         src__fixop__systemd__daemon_reload["daemon_reload"]
         src__fixop__systemd__graceful_restart["graceful_restart"]
         src__fixop__systemd__graceful_restart_all["graceful_restart_all"]
+        src__fixop__ssh__check_ssh_key["check_ssh_key"]
+        src__fixop__ssh__check_ssh_connectivity("check_ssh_connectivity CC=9")
         src__fixop__cli__output__output_issues["output_issues"]
         src__fixop__cli__output___format_json["_format_json"]
         src__fixop__cli__output___format_text("_format_text CC=9")
+        src__fixop__cli__output___group_by_category["_group_by_category"]
+        src__fixop__cli__output___summarize["_summarize"]
+        src__fixop__cli__main["main"]
+        src__fixop__cli___has_errors["_has_errors"]
+        src__fixop__cli___dispatch_check["_dispatch_check"]
+        src__fixop__cli___dispatch_fix["_dispatch_fix"]
+        src__fixop__cli___dispatch_validate["_dispatch_validate"]
     end
-    src__fixop__firewall__check_ufw_forward_policy --> src__fixop__transport__run_remote
-    src__fixop__firewall__check_nat_masquerade --> src__fixop__transport__run_remote
-    src__fixop__firewall__fix_ufw_allow_routed --> src__fixop__transport__run_remote
-    src__fixop__firewall__fix_nat_masquerade --> src__fixop__transport__run_remote
-    src__fixop__classify__classify_error --> src__fixop__classify___get_compiled_patterns
-    src__fixop__classify__classify_error --> src__fixop__classify___truncate
-    src__fixop__ports__find_free_port_near --> src__fixop__ports__is_port_free
-    src__fixop__ports__check_port --> src__fixop__ports__is_port_free
-    src__fixop__ports__check_port --> src__fixop__ports__who_uses_port
-    src__fixop__ports__check_port --> src__fixop__ports__find_free_port_near
-    src__fixop__ports__check_port --> src__fixop__ports__is_container_process
-    src__fixop__ports__check_ports --> src__fixop__ports__check_port
-    src__fixop__containers__check_runtime --> src__fixop__transport__run_remote
-    src__fixop__containers__check_containers_running --> src__fixop__transport__run_remote
-    src__fixop__containers__check_disk_usage --> src__fixop__transport__run_remote
-    src__fixop__containers__check_memory --> src__fixop__transport__run_remote
     src__fixop__drift__check_file_drift --> src__fixop__drift___extract_blocks
     src__fixop__drift__check_file_drift --> src__fixop__drift___sha256
-    src__fixop__dns__check_host_dns --> src__fixop__transport__run_remote
-    src__fixop__dns__check_container_dns --> src__fixop__transport__run_remote
-    src__fixop__dns__check_systemd_resolved --> src__fixop__transport__run_remote
-    src__fixop__dns__fix_resolv_conf --> src__fixop__transport__run_remote
-    src__fixop__dns__fix_disable_systemd_resolved --> src__fixop__transport__run_remote
+    src__fixop__classify__classify_error --> src__fixop__classify___get_compiled_patterns
+    src__fixop__classify__classify_error --> src__fixop__classify___truncate
     src__fixop__check_all --> src__fixop__ssh__check_ssh_connectivity
     src__fixop__check_all --> src__fixop__dns__check_host_dns
     src__fixop__check_all --> src__fixop__dns__check_systemd_resolved
     src__fixop__check_all --> src__fixop__firewall__check_ufw_forward_policy
     src__fixop__check_all --> src__fixop__containers__check_runtime
     src__fixop__check_all --> src__fixop__containers__check_disk_usage
-    src__fixop__health__check_http_endpoint --> src__fixop__health___unhealthy
-    src__fixop__health__run_health_checks --> src__fixop__health__check_ssh_service
-    src__fixop__health__run_health_checks --> src__fixop__health__check_http_endpoint
+    src__fixop__containers__check_runtime --> src__fixop__transport__run_remote
+    src__fixop__containers__check_containers_running --> src__fixop__transport__run_remote
+    src__fixop__containers__check_disk_usage --> src__fixop__transport__run_remote
+    src__fixop__containers__check_memory --> src__fixop__transport__run_remote
+    src__fixop__firewall__check_ufw_forward_policy --> src__fixop__transport__run_remote
+    src__fixop__firewall__check_nat_masquerade --> src__fixop__transport__run_remote
+    src__fixop__firewall__fix_ufw_allow_routed --> src__fixop__transport__run_remote
+    src__fixop__firewall__fix_nat_masquerade --> src__fixop__transport__run_remote
+    src__fixop__ports__find_free_port_near --> src__fixop__ports__is_port_free
+    src__fixop__ports__check_port --> src__fixop__ports__is_port_free
+    src__fixop__ports__check_port --> src__fixop__ports__who_uses_port
+    src__fixop__ports__check_port --> src__fixop__ports__find_free_port_near
+    src__fixop__ports__check_port --> src__fixop__ports__is_container_process
+    src__fixop__ports__check_ports --> src__fixop__ports__check_port
+    src__fixop__dns__check_host_dns --> src__fixop__transport__run_remote
+    src__fixop__dns__check_container_dns --> src__fixop__transport__run_remote
+    src__fixop__dns__check_systemd_resolved --> src__fixop__transport__run_remote
+    src__fixop__dns__fix_resolv_conf --> src__fixop__transport__run_remote
+    src__fixop__dns__fix_disable_systemd_resolved --> src__fixop__transport__run_remote
     src__fixop__deploy___scan_file_for_vars --> src__fixop__deploy___scan_line_for_vars
     src__fixop__deploy__check_unresolved_vars --> src__fixop__deploy___scan_file_for_vars
     src__fixop__deploy__scan_deploy_dir --> src__fixop__deploy__check_unresolved_vars
     src__fixop__deploy__scan_deploy_dir --> src__fixop__deploy__check_placeholders
-    src__fixop__ssh__check_ssh_connectivity --> src__fixop__transport__test_ssh_connection
     src__fixop__tls__check_certificate --> src__fixop__tls___connect_and_get_cert
     src__fixop__tls__check_certificate --> src__fixop__tls___validate_expiry
     src__fixop__tls__check_certificate --> src__fixop__tls___validate_issuer
@@ -109,13 +105,17 @@ flowchart TD
     src__fixop__systemd__daemon_reload --> src__fixop__transport__run_remote
     src__fixop__systemd__graceful_restart --> src__fixop__transport__run_remote
     src__fixop__systemd__graceful_restart_all --> src__fixop__systemd__graceful_restart
+    src__fixop__ssh__check_ssh_connectivity --> src__fixop__transport__test_ssh_connection
     src__fixop__cli__output__output_issues --> src__fixop__cli__output___format_json
     src__fixop__cli__output__output_issues --> src__fixop__cli__output___format_text
     src__fixop__cli__output___format_text --> src__fixop__cli__output___group_by_category
     src__fixop__cli__output___format_text --> src__fixop__cli__output___summarize
-    src__fixop__cli__drift_cmd__cmd_drift --> src__fixop__drift__check_file_drift
-    src__fixop__cli__drift_cmd__cmd_drift --> src__fixop__cli__output__output_issues
-    src__fixop__cli__drift_cmd__cmd_drift --> src__fixop__drift__check_untracked_files
+    src__fixop__cli___dispatch_check --> src__fixop__cli__check_cmd__cmd_check
+    src__fixop__cli___dispatch_fix --> src__fixop__cli__fix_cmd__cmd_fix
+    src__fixop__cli___dispatch_validate --> src__fixop__cli__validate_cmd__cmd_validate
+    src__fixop__cli___dispatch_check_tls --> src__fixop__cli__validate_cmd__cmd_check_tls
+    src__fixop__cli___dispatch_drift --> src__fixop__cli__drift_cmd__cmd_drift
+    src__fixop__cli___dispatch_doctor --> src__fixop__cli__check_cmd__cmd_doctor
     src__fixop__cli__fix_cmd__cmd_fix --> src__fixop__check_all
     src__fixop__cli__fix_cmd__cmd_fix --> src__fixop__cli__fix_cmd___discover_fixable
     src__fixop__cli__fix_cmd__cmd_fix --> src__fixop__cli__fix_cmd___apply_all
@@ -123,12 +123,9 @@ flowchart TD
     src__fixop__cli__fix_cmd___apply_single --> src__fixop__transport__run_remote
     src__fixop__cli__fix_cmd___apply_all --> src__fixop__cli__fix_cmd___apply_single
     src__fixop__cli__fix_cmd___apply_all --> src__fixop__cli__fix_cmd___confirm_fix
-    src__fixop__cli___dispatch_check --> src__fixop__cli__check_cmd__cmd_check
-    src__fixop__cli___dispatch_fix --> src__fixop__cli__fix_cmd__cmd_fix
-    src__fixop__cli___dispatch_validate --> src__fixop__cli__validate_cmd__cmd_validate
-    src__fixop__cli___dispatch_check_tls --> src__fixop__cli__validate_cmd__cmd_check_tls
-    src__fixop__cli___dispatch_drift --> src__fixop__cli__drift_cmd__cmd_drift
-    src__fixop__cli___dispatch_doctor --> src__fixop__cli__check_cmd__cmd_doctor
+    src__fixop__cli__drift_cmd__cmd_drift --> src__fixop__drift__check_file_drift
+    src__fixop__cli__drift_cmd__cmd_drift --> src__fixop__cli__output__output_issues
+    src__fixop__cli__drift_cmd__cmd_drift --> src__fixop__drift__check_untracked_files
     src__fixop__cli__validate_cmd__cmd_validate --> src__fixop__deploy__scan_deploy_dir
     src__fixop__cli__validate_cmd__cmd_validate --> src__fixop__cli__output__output_issues
     src__fixop__cli__validate_cmd__cmd_check_tls --> src__fixop__tls__check_certificates
@@ -139,7 +136,10 @@ flowchart TD
     src__fixop__cli__check_cmd__cmd_doctor --> src__fixop__cli__output__output_issues
     src__fixop__cli__check_cmd__cmd_doctor --> src__fixop__cli__check_cmd___apply_fixes
     src__fixop__cli__check_cmd___apply_fixes --> src__fixop__transport__run_remote
+    src__fixop__health__check_http_endpoint --> src__fixop__health___unhealthy
+    src__fixop__health__run_health_checks --> src__fixop__health__check_ssh_service
+    src__fixop__health__run_health_checks --> src__fixop__health__check_http_endpoint
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class src__fixop__classify__classify_error,src__fixop__classify__get_tip_for_failure,src__fixop__drift__check_file_drift,src__fixop__drift__check_untracked_files,src__fixop__dns__check_container_dns,src__fixop__health__check_http_endpoint,src__fixop__health__run_health_checks,src__fixop__deploy__check_placeholders,src__fixop__ssh__check_ssh_connectivity,src__fixop__tls__check_acme_readiness,src__fixop__systemd__check_unit_status,src__fixop__cli__output___format_text,src__fixop__cli__check_cmd__cmd_check,src__fixop__cli__check_cmd__cmd_doctor medCC
+    class src__fixop__drift__check_file_drift,src__fixop__drift__check_untracked_files,src__fixop__classify__classify_error,src__fixop__classify__get_tip_for_failure,src__fixop__dns__check_container_dns,src__fixop__deploy__check_placeholders,src__fixop__tls__check_acme_readiness,src__fixop__systemd__check_unit_status,src__fixop__ssh__check_ssh_connectivity,src__fixop__cli__output___format_text,src__fixop__cli__check_cmd__cmd_check,src__fixop__cli__check_cmd__cmd_doctor,src__fixop__health__check_http_endpoint,src__fixop__health__run_health_checks medCC
