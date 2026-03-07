@@ -16,7 +16,89 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from .models import Category, FixStrategy, HostContext, Issue, Severity
-from .ssh import run_remote
+from .transport import run_remote
+
+
+def _connect_and_get_cert(domain: str, port: int) -> dict | None:
+    """Connect via TLS and return the peer certificate dict, or raise on error."""
+    ctx = ssl.create_default_context()
+    with socket.create_connection((domain, port), timeout=10) as sock:
+        with ctx.wrap_socket(sock, server_hostname=domain) as ssock:
+            return ssock.getpeercert()
+
+
+def _validate_expiry(cert: dict, domain: str, warn_days: int) -> list[Issue]:
+    """Check certificate expiry. Returns issues for expired or soon-expiring certs."""
+    not_after = cert.get("notAfter", "")
+    if not not_after:
+        return []
+    expiry = datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=timezone.utc)
+    days_left = (expiry - datetime.now(timezone.utc)).days
+
+    if days_left < 0:
+        return [Issue(
+            category=Category.TLS,
+            severity=Severity.CRITICAL,
+            message=f"Certificate for {domain} expired {abs(days_left)} days ago",
+            fix_strategy=FixStrategy.MANUAL,
+            details="Renew the certificate. If using Let's Encrypt, check ACME configuration.",
+        )]
+    if days_left < warn_days:
+        return [Issue(
+            category=Category.TLS,
+            severity=Severity.WARNING,
+            message=f"Certificate for {domain} expires in {days_left} days",
+            fix_strategy=FixStrategy.MANUAL,
+            details="Certificate will expire soon. Check auto-renewal is working.",
+        )]
+    return []
+
+
+def _validate_issuer(cert: dict, domain: str) -> list[Issue]:
+    """Check if certificate is self-signed."""
+    issuer = dict(x[0] for x in cert.get("issuer", ()))
+    subject = dict(x[0] for x in cert.get("subject", ()))
+    if issuer == subject:
+        return [Issue(
+            category=Category.TLS,
+            severity=Severity.WARNING,
+            message=f"Self-signed certificate detected for {domain}",
+            fix_strategy=FixStrategy.MANUAL,
+            details="Use Let's Encrypt or another CA for production certificates.",
+        )]
+    return []
+
+
+def _handle_connection_error(e: Exception, domain: str, port: int) -> Issue:
+    """Convert a connection exception to an Issue."""
+    if isinstance(e, ssl.SSLCertVerificationError):
+        return Issue(
+            category=Category.TLS, severity=Severity.ERROR,
+            message=f"TLS verification failed for {domain}: {str(e)[:100]}",
+            fix_strategy=FixStrategy.MANUAL,
+            details="Certificate is invalid or not trusted. Check ACME configuration.",
+        )
+    if isinstance(e, ssl.SSLError):
+        return Issue(
+            category=Category.TLS, severity=Severity.ERROR,
+            message=f"TLS error for {domain}: {str(e)[:100]}",
+        )
+    if isinstance(e, socket.timeout):
+        return Issue(
+            category=Category.TLS, severity=Severity.ERROR,
+            message=f"Connection to {domain}:{port} timed out",
+            details="Port may be blocked by firewall or service not running.",
+        )
+    if isinstance(e, ConnectionRefusedError):
+        return Issue(
+            category=Category.TLS, severity=Severity.ERROR,
+            message=f"Connection refused to {domain}:{port}",
+            details="No service listening on port 443. Check Traefik/reverse proxy.",
+        )
+    return Issue(
+        category=Category.TLS, severity=Severity.ERROR,
+        message=f"Cannot connect to {domain}:{port}: {str(e)[:80]}",
+    )
 
 
 def check_certificate(domain: str, port: int = 443, warn_days: int = 14) -> list[Issue]:
@@ -27,94 +109,19 @@ def check_certificate(domain: str, port: int = 443, warn_days: int = 14) -> list
         port: TLS port (default 443).
         warn_days: Warn if cert expires within this many days.
     """
-    issues: list[Issue] = []
-
     try:
-        ctx = ssl.create_default_context()
-        with socket.create_connection((domain, port), timeout=10) as sock:
-            with ctx.wrap_socket(sock, server_hostname=domain) as ssock:
-                cert = ssock.getpeercert()
+        cert = _connect_and_get_cert(domain, port)
+    except (ssl.SSLError, socket.timeout, ConnectionRefusedError, OSError) as e:
+        return [_handle_connection_error(e, domain, port)]
 
-        if not cert:
-            issues.append(Issue(
-                category=Category.TLS,
-                severity=Severity.ERROR,
-                message=f"No certificate returned for {domain}:{port}",
-            ))
-            return issues
-
-        # Check expiry
-        not_after = cert.get("notAfter", "")
-        if not_after:
-            expiry = datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=timezone.utc)
-            now = datetime.now(timezone.utc)
-            days_left = (expiry - now).days
-
-            if days_left < 0:
-                issues.append(Issue(
-                    category=Category.TLS,
-                    severity=Severity.CRITICAL,
-                    message=f"Certificate for {domain} expired {abs(days_left)} days ago",
-                    fix_strategy=FixStrategy.MANUAL,
-                    details="Renew the certificate. If using Let's Encrypt, check ACME configuration.",
-                ))
-            elif days_left < warn_days:
-                issues.append(Issue(
-                    category=Category.TLS,
-                    severity=Severity.WARNING,
-                    message=f"Certificate for {domain} expires in {days_left} days",
-                    fix_strategy=FixStrategy.MANUAL,
-                    details="Certificate will expire soon. Check auto-renewal is working.",
-                ))
-
-        # Check for self-signed
-        issuer = dict(x[0] for x in cert.get("issuer", ()))
-        subject = dict(x[0] for x in cert.get("subject", ()))
-        if issuer == subject:
-            issues.append(Issue(
-                category=Category.TLS,
-                severity=Severity.WARNING,
-                message=f"Self-signed certificate detected for {domain}",
-                fix_strategy=FixStrategy.MANUAL,
-                details="Use Let's Encrypt or another CA for production certificates.",
-            ))
-
-    except ssl.SSLCertVerificationError as e:
-        issues.append(Issue(
+    if not cert:
+        return [Issue(
             category=Category.TLS,
             severity=Severity.ERROR,
-            message=f"TLS verification failed for {domain}: {str(e)[:100]}",
-            fix_strategy=FixStrategy.MANUAL,
-            details="Certificate is invalid or not trusted. Check ACME configuration.",
-        ))
-    except ssl.SSLError as e:
-        issues.append(Issue(
-            category=Category.TLS,
-            severity=Severity.ERROR,
-            message=f"TLS error for {domain}: {str(e)[:100]}",
-        ))
-    except socket.timeout:
-        issues.append(Issue(
-            category=Category.TLS,
-            severity=Severity.ERROR,
-            message=f"Connection to {domain}:{port} timed out",
-            details="Port may be blocked by firewall or service not running.",
-        ))
-    except ConnectionRefusedError:
-        issues.append(Issue(
-            category=Category.TLS,
-            severity=Severity.ERROR,
-            message=f"Connection refused to {domain}:{port}",
-            details="No service listening on port 443. Check Traefik/reverse proxy.",
-        ))
-    except OSError as e:
-        issues.append(Issue(
-            category=Category.TLS,
-            severity=Severity.ERROR,
-            message=f"Cannot connect to {domain}:{port}: {str(e)[:80]}",
-        ))
+            message=f"No certificate returned for {domain}:{port}",
+        )]
 
-    return issues
+    return _validate_expiry(cert, domain, warn_days) + _validate_issuer(cert, domain)
 
 
 def check_certificates(domains: list[str], port: int = 443, warn_days: int = 14) -> list[Issue]:

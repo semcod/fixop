@@ -7,6 +7,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-03-07
+
+### Docs
+- Update CHANGELOG.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update VERSION
+- Update project/analysis.toon
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/dashboard.html
+- Update project/evolution.toon
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 5 more files
+
+## [0.1.12] - 2026-03-07
+
+### Docs
+- Update CHANGELOG.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update VERSION
+- Update project/analysis.toon
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/dashboard.html
+- Update project/evolution.toon
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 5 more files
+
+## [0.1.11] - 2026-03-07
+
+### Docs
+- Update CHANGELOG.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update VERSION
+- Update project/analysis.toon
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/dashboard.html
+- Update project/evolution.toon
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 5 more files
+
+## [0.1.10] - 2026-03-07
+
+### Docs
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update VERSION
+- Update project/analysis.toon
+- Update project/calls.mmd
+- Update project/calls.png
+- Update project/compact_flow.mmd
+- Update project/compact_flow.png
+- Update project/dashboard.html
+- Update project/evolution.toon
+- Update project/flow.mmd
+- Update project/flow.png
+- ... and 5 more files
+
 ## [0.1.8] - 2026-03-07
 
 ### Docs

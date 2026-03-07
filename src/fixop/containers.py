@@ -14,7 +14,7 @@ Extracted from: taskfile/diagnostics/checks_ssh.py (check_remote_health),
 from __future__ import annotations
 
 from .models import Category, FixStrategy, HostContext, Issue, Severity
-from .ssh import run_remote
+from .transport import run_remote
 
 
 def check_runtime(ctx: HostContext, runtime: str = "podman") -> list[Issue]:

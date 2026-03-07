@@ -15,7 +15,7 @@ from __future__ import annotations
 import time
 
 from .models import Category, FixResult, FixStrategy, HostContext, Issue, Severity
-from .ssh import run_remote
+from .transport import run_remote
 
 
 def check_unit_status(ctx: HostContext, units: list[str]) -> list[Issue]:

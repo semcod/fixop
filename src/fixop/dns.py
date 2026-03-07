@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Optional
 
 from .models import HostContext, Issue, FixResult, Category, Severity, FixStrategy
-from .ssh import run_remote
+from .transport import run_remote
 
 DEFAULT_NAMESERVERS = ["8.8.8.8", "1.1.1.1"]
 TEST_DOMAIN = "acme-v02.api.letsencrypt.org"  # critical for ACME cert generation

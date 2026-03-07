@@ -1,12 +1,9 @@
-# code2llm | 13f 2289L | py:13 | 2026-03-07
-# CC̄=5.6 | critical:10/57 | dups:0 | cycles:0
+# code2llm | 18f 2436L | py:18 | 2026-03-07
+# CC̄=4.5 | critical:6/75 | dups:0 | cycles:0
 
-HEALTH[2]:
-  🟡 CC    _cmd_fix CC=16 (limit:15)
-  🟡 CC    _output_issues CC=18 (limit:15)
+HEALTH[0]: ok
 
-REFACTOR[1]:
-  1. split 2 high-CC methods  (CC>15)
+REFACTOR[0]: none needed
 
 COUPLING:
                    src  src.fixop
@@ -17,51 +14,52 @@ COUPLING:
   SMELL: src/ fan-out=11 → split needed
 
 LAYERS:
-  src/                            CC̄=5.6    ←in:3  →out:11  !! split
-  │ !! cli                        265L  0C    7m  CC=18     ←0
+  src/                            CC̄=4.5    ←in:3  →out:11  !! split
   │ !  health                     245L  2C    5m  CC=11     ←0
-  │ ssh                        226L  1C    4m  CC=9      ←7
+  │ deploy                     207L  0C    6m  CC=8      ←1
   │ !  systemd                    206L  0C    5m  CC=10     ←1
   │ dns                        194L  0C    6m  CC=9      ←1
-  │ !  deploy                     191L  0C    4m  CC=14     ←1
   │ !  tls                        185L  0C    3m  CC=13     ←2
   │ containers                 170L  0C    4m  CC=7      ←1
   │ !  classify                   161L  0C    5m  CC=10     ←0
+  │ ssh                        139L  0C    2m  CC=9      ←1
+  │ __init__                   124L  0C    7m  CC=4      ←0
   │ firewall                   118L  0C    4m  CC=5      ←1
-  │ __init__                   113L  0C    1m  CC=7      ←1
+  │ __init__                   113L  0C    1m  CC=7      ←2
   │ ports                      112L  0C    6m  CC=7      ←0
   │ models                     103L  6C    3m  CC=2      ←0
+  │ transport                  100L  1C    2m  CC=4      ←8
+  │ fix_cmd                     82L  0C    6m  CC=6      ←1
+  │ output                      77L  0C    5m  CC=9      ←2
+  │ check_cmd                   73L  0C    3m  CC=9      ←1
+  │ validate_cmd                27L  0C    2m  CC=3      ←1
   │
 
 DUPLICATES[0]: none
 
-FUNCTIONS (CC≥10, 10 of 57):
-   18.0  _output_issues                             10n   2exit  loops+cond+ret  !! split
-   16.0  _cmd_fix                                   17n   3exit  loops+cond+ret  !! split
-   14.0  check_unresolved_vars                      12n   2exit  loops+cond+ret
-   14.0  _cmd_doctor                                13n   3exit  loops+cond+ret
+FUNCTIONS (CC≥10, 6 of 75):
    13.0  check_certificate                           3n   2exit  ret
    11.0  check_http_endpoint                         4n   2exit  loops+ret
    10.0  classify_error                             14n   4exit  loops+cond+ret
    10.0  check_acme_readiness                       14n   3exit  cond+ret
-   10.0  check_unit_status                          10n   2exit  loops+cond+ret
    10.0  run_health_checks                          10n   2exit  loops+cond+ret
+   10.0  check_unit_status                          10n   2exit  loops+cond+ret
 
   summary:
-    critical(≥10): 10 | high(5-10): 19 | medium(2-5): 21 | low(<2): 7
-    18% CC≥10  51% CC≥5
+    critical(≥10): 6 | high(5-10): 27 | medium(2-5): 28 | low(<2): 14
+    8% CC≥10  44% CC≥5
 
 HOTSPOTS:
-  #1  main                                 fan=17   "calls 17 functions"
-  #2  check_unresolved_vars                fan=15   "calls 15 functions"
-  #3  check_certificate                    fan=13   "calls 13 functions"
-  #4  check_all                            fan=12   "calls 12 functions"
-  #5  scan_deploy_dir                      fan=12   "calls 12 functions"
-  #6  check_placeholders                   fan=10   "calls 10 functions"
-  #7  _cmd_fix                             fan=10   "calls 10 functions"
-  #8  _output_issues                       fan=10   "calls 10 functions"
-  #9  check_http_endpoint                  fan=10   "calls 10 functions"
-  #10 _cmd_check                           fan=9    "calls 9 functions"
+  #1  main                                 fan=14   "calls 14 functions"
+  #2  check_certificate                    fan=13   "calls 13 functions"
+  #3  check_all                            fan=12   "calls 12 functions"
+  #4  scan_deploy_dir                      fan=12   "calls 12 functions"
+  #5  check_placeholders                   fan=10   "calls 10 functions"
+  #6  check_http_endpoint                  fan=10   "calls 10 functions"
+  #7  cmd_fix                              fan=10   "calls 10 functions"
+  #8  check_ssh_key                        fan=9    "calls 9 functions"
+  #9  _format_text                         fan=9    "9-way dispatch"
+  #10 cmd_check                            fan=9    "calls 9 functions"
 
 CLASSES:
   Issue                          ████████████████████████   1m  CC̄=1.0   max=1   
@@ -75,21 +73,6 @@ CLASSES:
   FixStrategy                                               0m  CC̄=0.0   max=0.0 
 
 D:
-  src/fixop/cli.py:
-    e: main,_cmd_check,_cmd_fix,_cmd_validate,_cmd_check_tls,_cmd_doctor,_output_issues
-    main(argv)
-    _cmd_check(args)
-    _cmd_fix(args)
-    _cmd_validate(args)
-    _cmd_check_tls(args)
-    _cmd_doctor(args)
-    _output_issues(issues,fmt)
-  src/fixop/deploy.py:
-    e: check_unresolved_vars,check_placeholders,check_files_exist,scan_deploy_dir
-    check_unresolved_vars(paths,patterns)
-    check_placeholders(paths)
-    check_files_exist(file_patterns,base_dir)
-    scan_deploy_dir(deploy_dir,globs)
   src/fixop/tls.py:
     e: check_certificate,check_certificates,check_acme_readiness
     check_certificate(domain,port,warn_days)
@@ -127,12 +110,29 @@ D:
     fix_disable_systemd_resolved(ctx)
     generate_container_resolv_conf(output_path,nameservers)
   src/fixop/ssh.py:
-    e: RemoteResult,run_remote,test_ssh_connection,check_ssh_key,check_ssh_connectivity
-    RemoteResult  # Result of a remote command execution....
-    run_remote(ctx,command,timeout)
-    test_ssh_connection(ctx,timeout)
+    e: check_ssh_key,check_ssh_connectivity
     check_ssh_key(key_path)
     check_ssh_connectivity(ctx)
+  src/fixop/cli/output.py:
+    e: output_issues,_format_json,_format_text,_group_by_category,_summarize
+    output_issues(issues,fmt)
+    _format_json(issues)
+    _format_text(issues)
+    _group_by_category(issues)
+    _summarize(issues)
+  src/fixop/cli/check_cmd.py:
+    e: cmd_check,cmd_doctor,_apply_fixes
+    cmd_check(args)
+    cmd_doctor(args)
+    _apply_fixes(ctx,issues)
+  src/fixop/deploy.py:
+    e: _scan_line_for_vars,_scan_file_for_vars,check_unresolved_vars,check_placeholders,check_files_exist,scan_deploy_dir
+    _scan_line_for_vars(line,lineno,filepath,extra_patterns)
+    _scan_file_for_vars(filepath,extra_patterns)
+    check_unresolved_vars(paths,patterns)
+    check_placeholders(paths)
+    check_files_exist(file_patterns,base_dir)
+    scan_deploy_dir(deploy_dir,globs)
   src/fixop/ports.py:
     e: is_port_free,find_free_port_near,who_uses_port,is_container_process,check_port,check_ports
     is_port_free(port,host)
@@ -150,12 +150,38 @@ D:
     check_containers_running(ctx,expected,runtime)
     check_disk_usage(ctx,warn_mb)
     check_memory(ctx,warn_percent)
+  src/fixop/cli/fix_cmd.py:
+    e: cmd_fix,_discover_fixable,_confirm_fix,_apply_single,_apply_all,_report_fixes
+    cmd_fix(args)
+    _discover_fixable(issues)
+    _confirm_fix(issue)
+    _apply_single(ctx,issue)
+    _apply_all(ctx,fixable,auto,interactive)
+    _report_fixes(results,total)
   src/fixop/firewall.py:
     e: check_ufw_forward_policy,check_nat_masquerade,fix_ufw_allow_routed,fix_nat_masquerade
     check_ufw_forward_policy(ctx)
     check_nat_masquerade(ctx,subnet)
     fix_ufw_allow_routed(ctx)
     fix_nat_masquerade(ctx,subnet)
+  src/fixop/cli/__init__.py:
+    e: main,_has_errors,_dispatch_check,_dispatch_fix,_dispatch_validate,_dispatch_check_tls,_dispatch_doctor
+    main(argv)
+    _has_errors(issues)
+    _dispatch_check(args)
+    _dispatch_fix(args)
+    _dispatch_validate(args)
+    _dispatch_check_tls(args)
+    _dispatch_doctor(args)
+  src/fixop/transport.py:
+    e: RemoteResult,run_remote,test_ssh_connection
+    RemoteResult  # Result of a remote command execution....
+    run_remote(ctx,command,timeout)
+    test_ssh_connection(ctx,timeout)
+  src/fixop/cli/validate_cmd.py:
+    e: cmd_validate,cmd_check_tls
+    cmd_validate(args)
+    cmd_check_tls(args)
   src/fixop/models.py:
     e: Severity,Category,FixStrategy,Issue,FixResult,HostContext
     Severity

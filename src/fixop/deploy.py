@@ -38,6 +38,64 @@ DEFAULT_DEPLOY_GLOBS = (
 )
 
 
+def _scan_line_for_vars(
+    line: str, lineno: int, filepath: Path, extra_patterns: list[re.Pattern],
+) -> list[Issue]:
+    """Match unresolved variables and extra patterns on a single line."""
+    issues: list[Issue] = []
+    stripped = line.strip()
+
+    for m in _UNRESOLVED_VAR_RE.finditer(line):
+        var_name = m.group(1)
+        issues.append(Issue(
+            category=Category.DEPLOY,
+            severity=Severity.WARNING,
+            message=f"Unresolved variable ${{{var_name}}} in {filepath.name}:{lineno}",
+            fix_strategy=FixStrategy.MANUAL,
+            details=f"Set {var_name} in your .env file, then regenerate deploy files. Line: {stripped[:120]}",
+        ))
+
+    for m in _UNRESOLVED_TMPL_RE.finditer(line):
+        var_name = m.group(1)
+        if var_name.startswith("."):
+            continue  # Skip Go template syntax like {{ .Name }}
+        issues.append(Issue(
+            category=Category.DEPLOY,
+            severity=Severity.WARNING,
+            message=f"Unresolved template {{{{{var_name}}}}} in {filepath.name}:{lineno}",
+            fix_strategy=FixStrategy.MANUAL,
+            details=f"Set {var_name} in your variables section. Line: {stripped[:120]}",
+        ))
+
+    for pat in extra_patterns:
+        if pat.search(line):
+            issues.append(Issue(
+                category=Category.DEPLOY,
+                severity=Severity.WARNING,
+                message=f"Pattern match in {filepath.name}:{lineno}: {stripped[:80]}",
+            ))
+
+    return issues
+
+
+def _scan_file_for_vars(
+    filepath: Path, extra_patterns: list[re.Pattern],
+) -> list[Issue]:
+    """Scan a single file for unresolved variables."""
+    try:
+        content = filepath.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+
+    issues: list[Issue] = []
+    for lineno, line in enumerate(content.splitlines(), 1):
+        stripped = line.strip()
+        if stripped.startswith("#") or stripped.startswith("//"):
+            continue
+        issues.extend(_scan_line_for_vars(line, lineno, filepath, extra_patterns))
+    return issues
+
+
 def check_unresolved_vars(
     paths: list[str],
     patterns: Optional[list[str]] = None,
@@ -48,56 +106,14 @@ def check_unresolved_vars(
         paths: File paths to scan.
         patterns: Additional regex patterns to match (optional).
     """
-    issues: list[Issue] = []
-
     extra_patterns = [re.compile(p) for p in (patterns or [])]
+    issues: list[Issue] = []
 
     for path_str in paths:
         filepath = Path(path_str)
         if not filepath.is_file():
             continue
-        try:
-            content = filepath.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-
-        for lineno, line in enumerate(content.splitlines(), 1):
-            stripped = line.strip()
-            if stripped.startswith("#") or stripped.startswith("//"):
-                continue
-
-            # Check ${VAR}
-            for m in _UNRESOLVED_VAR_RE.finditer(line):
-                var_name = m.group(1)
-                issues.append(Issue(
-                    category=Category.DEPLOY,
-                    severity=Severity.WARNING,
-                    message=f"Unresolved variable ${{{var_name}}} in {filepath.name}:{lineno}",
-                    fix_strategy=FixStrategy.MANUAL,
-                    details=f"Set {var_name} in your .env file, then regenerate deploy files. Line: {stripped[:120]}",
-                ))
-
-            # Check {{VAR}} (Jinja/Go template style)
-            for m in _UNRESOLVED_TMPL_RE.finditer(line):
-                var_name = m.group(1)
-                if var_name.startswith("."):
-                    continue  # Skip Go template syntax like {{ .Name }}
-                issues.append(Issue(
-                    category=Category.DEPLOY,
-                    severity=Severity.WARNING,
-                    message=f"Unresolved template {{{{{var_name}}}}} in {filepath.name}:{lineno}",
-                    fix_strategy=FixStrategy.MANUAL,
-                    details=f"Set {var_name} in your variables section. Line: {stripped[:120]}",
-                ))
-
-            # Check extra patterns
-            for pat in extra_patterns:
-                if pat.search(line):
-                    issues.append(Issue(
-                        category=Category.DEPLOY,
-                        severity=Severity.WARNING,
-                        message=f"Pattern match in {filepath.name}:{lineno}: {stripped[:80]}",
-                    ))
+        issues.extend(_scan_file_for_vars(filepath, extra_patterns))
 
     return issues
 

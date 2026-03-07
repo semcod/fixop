@@ -3,39 +3,24 @@ project:
   name: fixop
   repo: /home/tom/github/wronai/fixop
   language: python
-  analyzed_at: '2026-03-07T09:08:00Z'
+  analyzed_at: '2026-03-07T17:35:34Z'
   tool: code2llm
   stats:
-    files: 13
-    lines: 3086
-    functions: 57
+    files: 18
+    lines: 3233
+    functions: 75
     classes: 9
 health:
-  cc_avg: 5.6
-  critical_count: 10
+  cc_avg: 4.5
+  critical_count: 6
   critical_limit: 10
   duplicates: 0
   cycles: 0
   alerts:
   - type: high_fan_out
     target: main
-    value: 17
+    value: 14
     limit: 10
-    severity: error
-  - type: high_fan_out
-    target: check_unresolved_vars
-    value: 15
-    limit: 10
-    severity: error
-  - type: cc_exceeded
-    target: _output_issues
-    value: 18
-    limit: 15
-    severity: warning
-  - type: cc_exceeded
-    target: _cmd_fix
-    value: 16
-    limit: 15
     severity: warning
   - type: high_fan_out
     target: check_certificate
@@ -58,54 +43,16 @@ health:
     limit: 10
     severity: warning
   - type: high_fan_out
-    target: _cmd_fix
-    value: 10
-    limit: 10
-    severity: warning
-  - type: high_fan_out
-    target: _output_issues
-    value: 10
-    limit: 10
-    severity: warning
-  - type: high_fan_out
     target: check_http_endpoint
     value: 10
     limit: 10
     severity: warning
+  - type: high_fan_out
+    target: cmd_fix
+    value: 10
+    limit: 10
+    severity: warning
 modules:
-- path: src/fixop/cli.py
-  lines: 265
-  classes: 0
-  methods: 7
-  cc_max: 18
-  inbound_deps: 0
-  exports:
-  - name: main
-    type: function
-    cc: 8
-    fan_out: 17
-- path: src/fixop/deploy.py
-  lines: 191
-  classes: 0
-  methods: 4
-  cc_max: 14
-  inbound_deps: 1
-  exports:
-  - name: check_unresolved_vars
-    type: function
-    cc: 14
-    fan_out: 15
-  - name: check_placeholders
-    type: function
-    cc: 8
-    fan_out: 10
-  - name: check_files_exist
-    type: function
-    cc: 3
-  - name: scan_deploy_dir
-    type: function
-    cc: 6
-    fan_out: 12
 - path: src/fixop/tls.py
   lines: 185
   classes: 0
@@ -187,6 +134,29 @@ modules:
   - name: graceful_restart_all
     type: function
     cc: 3
+- path: src/fixop/cli/check_cmd.py
+  lines: 73
+  classes: 0
+  methods: 3
+  cc_max: 9
+  inbound_deps: 1
+  exports:
+  - name: cmd_check
+    type: function
+    cc: 9
+  - name: cmd_doctor
+    type: function
+    cc: 8
+- path: src/fixop/cli/output.py
+  lines: 77
+  classes: 0
+  methods: 5
+  cc_max: 9
+  inbound_deps: 2
+  exports:
+  - name: output_issues
+    type: function
+    cc: 2
 - path: src/fixop/dns.py
   lines: 194
   classes: 0
@@ -213,33 +183,45 @@ modules:
     type: function
     cc: 3
 - path: src/fixop/ssh.py
-  lines: 226
-  classes: 1
-  methods: 4
+  lines: 139
+  classes: 0
+  methods: 2
   cc_max: 9
-  inbound_deps: 7
+  inbound_deps: 1
   exports:
-  - name: RemoteResult
-    type: class
-    cc_avg: 0.0
-  - name: run_remote
-    type: function
-    cc: 4
-  - name: test_ssh_connection
-    type: function
-    cc: 3
   - name: check_ssh_key
     type: function
     cc: 4
   - name: check_ssh_connectivity
     type: function
     cc: 9
+- path: src/fixop/deploy.py
+  lines: 207
+  classes: 0
+  methods: 6
+  cc_max: 8
+  inbound_deps: 1
+  exports:
+  - name: check_unresolved_vars
+    type: function
+    cc: 5
+  - name: check_placeholders
+    type: function
+    cc: 8
+    fan_out: 10
+  - name: check_files_exist
+    type: function
+    cc: 3
+  - name: scan_deploy_dir
+    type: function
+    cc: 6
+    fan_out: 12
 - path: src/fixop/__init__.py
   lines: 113
   classes: 0
   methods: 1
   cc_max: 7
-  inbound_deps: 1
+  inbound_deps: 2
   exports:
   - name: check_all
     type: function
@@ -289,6 +271,17 @@ modules:
   - name: check_ports
     type: function
     cc: 2
+- path: src/fixop/cli/fix_cmd.py
+  lines: 82
+  classes: 0
+  methods: 6
+  cc_max: 6
+  inbound_deps: 1
+  exports:
+  - name: cmd_fix
+    type: function
+    cc: 6
+    fan_out: 10
 - path: src/fixop/firewall.py
   lines: 118
   classes: 0
@@ -308,6 +301,46 @@ modules:
   - name: fix_nat_masquerade
     type: function
     cc: 1
+- path: src/fixop/cli/__init__.py
+  lines: 124
+  classes: 0
+  methods: 7
+  cc_max: 4
+  inbound_deps: 0
+  exports:
+  - name: main
+    type: function
+    cc: 4
+    fan_out: 14
+- path: src/fixop/transport.py
+  lines: 100
+  classes: 1
+  methods: 2
+  cc_max: 4
+  inbound_deps: 8
+  exports:
+  - name: RemoteResult
+    type: class
+    cc_avg: 0.0
+  - name: run_remote
+    type: function
+    cc: 4
+  - name: test_ssh_connection
+    type: function
+    cc: 3
+- path: src/fixop/cli/validate_cmd.py
+  lines: 27
+  classes: 0
+  methods: 2
+  cc_max: 3
+  inbound_deps: 1
+  exports:
+  - name: cmd_validate
+    type: function
+    cc: 2
+  - name: cmd_check_tls
+    type: function
+    cc: 3
 - path: src/fixop/models.py
   lines: 103
   classes: 6
@@ -335,12 +368,8 @@ modules:
     cc_avg: 1.0
 hotspots:
 - name: main
-  fan_out: 17
+  fan_out: 14
   note: Main CLI entry point.
-- name: check_unresolved_vars
-  fan_out: 15
-  note: "Scan files for unresolved ${VAR} and {{VAR}} patterns.\n\nArgs:\n    paths:\
-    \ File pa"
 - name: check_certificate
   fan_out: 13
   note: "Check if domain has a valid TLS certificate.\n\nArgs:\n    domain: Domain\
@@ -361,35 +390,18 @@ hotspots:
 
 
     Args'
-- name: _cmd_fix
-  fan_out: 10
-  note: Apply fixes.
-- name: _output_issues
-  fan_out: 10
-  note: Print issues in the requested format.
 - name: check_http_endpoint
   fan_out: 10
   note: "Check HTTP endpoint health.\n\nArgs:\n    name: Service name for display.\n\
     \    url: "
+- name: cmd_fix
+  fan_out: 10
+  note: Apply fixes for detected issues.
 refactoring:
-  priorities:
-  - action: Split _cmd_fix (CC=16 → target CC<10)
-    impact: medium
-    effort: low
-    module: cli.py
-  - action: Split _output_issues (CC=18 → target CC<10)
-    impact: medium
-    effort: low
-    module: cli.py
-  - action: Reduce main fan-out (currently 17)
-    impact: medium
-    effort: medium
-  - action: Reduce check_unresolved_vars fan-out (currently 15)
-    impact: medium
-    effort: medium
+  priorities: []
 evolution:
 - date: '2026-03-07'
-  cc_avg: 5.6
-  critical: 10
-  lines: 3086
+  cc_avg: 4.5
+  critical: 6
+  lines: 3233
   note: Automated analysis

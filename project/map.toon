@@ -1,35 +1,25 @@
-# fixop | 13f 2289L | python:13
+# fixop | 18f 2436L | python:18
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
-M[13]:
+M[18]:
   src/fixop/__init__.py,113
   src/fixop/classify.py,161
-  src/fixop/cli.py,265
+  src/fixop/cli/__init__.py,124
+  src/fixop/cli/check_cmd.py,73
+  src/fixop/cli/fix_cmd.py,82
+  src/fixop/cli/output.py,77
+  src/fixop/cli/validate_cmd.py,27
   src/fixop/containers.py,170
-  src/fixop/deploy.py,191
+  src/fixop/deploy.py,207
   src/fixop/dns.py,194
   src/fixop/firewall.py,118
   src/fixop/health.py,245
   src/fixop/models.py,103
   src/fixop/ports.py,112
-  src/fixop/ssh.py,226
+  src/fixop/ssh.py,139
   src/fixop/systemd.py,206
   src/fixop/tls.py,185
+  src/fixop/transport.py,100
 D:
-  src/fixop/cli.py:
-    e: main,_cmd_check,_cmd_fix,_cmd_validate,_cmd_check_tls,_cmd_doctor,_output_issues
-    main(argv)
-    _cmd_check(args)
-    _cmd_fix(args)
-    _cmd_validate(args)
-    _cmd_check_tls(args)
-    _cmd_doctor(args)
-    _output_issues(issues;fmt)
-  src/fixop/deploy.py:
-    e: check_unresolved_vars,check_placeholders,check_files_exist,scan_deploy_dir
-    check_unresolved_vars(paths;patterns)
-    check_placeholders(paths)
-    check_files_exist(file_patterns;base_dir)
-    scan_deploy_dir(deploy_dir;globs)
   src/fixop/tls.py:
     e: check_certificate,check_certificates,check_acme_readiness
     check_certificate(domain;port;warn_days)
@@ -67,12 +57,29 @@ D:
     fix_disable_systemd_resolved(ctx)
     generate_container_resolv_conf(output_path;nameservers)
   src/fixop/ssh.py:
-    e: RemoteResult,run_remote,test_ssh_connection,check_ssh_key,check_ssh_connectivity
-    RemoteResult:  # Result of a remote command execution...
-    run_remote(ctx;command;timeout)
-    test_ssh_connection(ctx;timeout)
+    e: check_ssh_key,check_ssh_connectivity
     check_ssh_key(key_path)
     check_ssh_connectivity(ctx)
+  src/fixop/cli/output.py:
+    e: output_issues,_format_json,_format_text,_group_by_category,_summarize
+    output_issues(issues;fmt)
+    _format_json(issues)
+    _format_text(issues)
+    _group_by_category(issues)
+    _summarize(issues)
+  src/fixop/cli/check_cmd.py:
+    e: cmd_check,cmd_doctor,_apply_fixes
+    cmd_check(args)
+    cmd_doctor(args)
+    _apply_fixes(ctx;issues)
+  src/fixop/deploy.py:
+    e: _scan_line_for_vars,_scan_file_for_vars,check_unresolved_vars,check_placeholders,check_files_exist,scan_deploy_dir
+    _scan_line_for_vars(line;lineno;filepath;extra_patterns)
+    _scan_file_for_vars(filepath;extra_patterns)
+    check_unresolved_vars(paths;patterns)
+    check_placeholders(paths)
+    check_files_exist(file_patterns;base_dir)
+    scan_deploy_dir(deploy_dir;globs)
   src/fixop/ports.py:
     e: is_port_free,find_free_port_near,who_uses_port,is_container_process,check_port,check_ports
     is_port_free(port;host)
@@ -90,12 +97,38 @@ D:
     check_containers_running(ctx;expected;runtime)
     check_disk_usage(ctx;warn_mb)
     check_memory(ctx;warn_percent)
+  src/fixop/cli/fix_cmd.py:
+    e: cmd_fix,_discover_fixable,_confirm_fix,_apply_single,_apply_all,_report_fixes
+    cmd_fix(args)
+    _discover_fixable(issues)
+    _confirm_fix(issue)
+    _apply_single(ctx;issue)
+    _apply_all(ctx;fixable;auto;interactive)
+    _report_fixes(results;total)
   src/fixop/firewall.py:
     e: check_ufw_forward_policy,check_nat_masquerade,fix_ufw_allow_routed,fix_nat_masquerade
     check_ufw_forward_policy(ctx)
     check_nat_masquerade(ctx;subnet)
     fix_ufw_allow_routed(ctx)
     fix_nat_masquerade(ctx;subnet)
+  src/fixop/cli/__init__.py:
+    e: main,_has_errors,_dispatch_check,_dispatch_fix,_dispatch_validate,_dispatch_check_tls,_dispatch_doctor
+    main(argv)
+    _has_errors(issues)
+    _dispatch_check(args)
+    _dispatch_fix(args)
+    _dispatch_validate(args)
+    _dispatch_check_tls(args)
+    _dispatch_doctor(args)
+  src/fixop/transport.py:
+    e: RemoteResult,run_remote,test_ssh_connection
+    RemoteResult:  # Result of a remote command execution...
+    run_remote(ctx;command;timeout)
+    test_ssh_connection(ctx;timeout)
+  src/fixop/cli/validate_cmd.py:
+    e: cmd_validate,cmd_check_tls
+    cmd_validate(args)
+    cmd_check_tls(args)
   src/fixop/models.py:
     e: Severity,Category,FixStrategy,Issue,FixResult,HostContext
     Severity(Enum):

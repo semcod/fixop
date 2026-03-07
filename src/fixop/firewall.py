@@ -11,7 +11,7 @@ Extracted from: taskfile/diagnostics/checks.py (_check_ufw_forward_policy)
 from __future__ import annotations
 
 from .models import Category, FixResult, FixStrategy, HostContext, Issue, Severity
-from .ssh import run_remote
+from .transport import run_remote
 
 
 def check_ufw_forward_policy(ctx: HostContext) -> list[Issue]:
