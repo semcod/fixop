@@ -1,27 +1,43 @@
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "fixop"
-version = "0.1.4"
-description = "A Python package for fixing operations"
+version = "0.1.5"
+description = "Infrastructure fix operations — detect and repair DNS, firewall, containers, TLS, systemd issues"
 readme = "README.md"
-requires-python = ">=3.7"
-authors = [
-    {name = "Tom Sapletta", email = "tom@sapletta.com"},
-]
 license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [{ name = "Tom Sapletta", email = "tom@sapletta.com" }]
+keywords = ["infrastructure", "devops", "diagnostics", "podman", "docker", "dns", "firewall", "systemd"]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Intended Audience :: System Administrators",
     "Intended Audience :: Developers",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: Networking",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
 ]
+# Zero external dependencies — stdlib only
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "ruff"]
+ssh = ["paramiko"]  # optional: native SSH instead of subprocess
+
+[project.scripts]
+fixop = "fixop.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/wronai/fixop"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fixop"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

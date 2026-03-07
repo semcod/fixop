@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-03-07
+
+### Docs
+- Update README.md
+
+### Test
+- Update tests/conftest.py
+- Update tests/test_classify.py
+- Update tests/test_containers.py
+- Update tests/test_deploy.py
+- Update tests/test_dns.py
+- Update tests/test_firewall.py
+- Update tests/test_ports.py
+- Update tests/test_systemd.py
+- Update tests/test_tls.py
+
 ## [0.1.4] - 2026-03-07
 
 ### Docs
