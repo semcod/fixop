@@ -15,11 +15,10 @@ import socket
 import subprocess
 import time
 from dataclasses import dataclass, field
-from typing import Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from .models import Category, FixStrategy, HostContext, Issue, Severity
+from .models import HostContext
 
 
 @dataclass
@@ -130,9 +129,12 @@ def check_ssh_service(
     if ssh_key:
         cmd += ["-i", ssh_key]
     cmd += [
-        "-o", "StrictHostKeyChecking=accept-new",
-        "-o", "ConnectTimeout=5",
-        "-o", "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=accept-new",
+        "-o",
+        "ConnectTimeout=5",
+        "-o",
+        "BatchMode=yes",
         f"{user}@{host}",
         "echo healthy",
     ]
@@ -216,7 +218,7 @@ def run_health_checks(
     if check_ssh:
         checks.append(check_ssh_service("SSH", ctx.host, ctx.user, ctx.key, ctx.port))
 
-    for domain in (domains or []):
+    for domain in domains or []:
         checks.append(check_http_endpoint(domain, f"https://{domain}"))
 
     unhealthy = sum(1 for c in checks if c.status == "unhealthy")
@@ -232,9 +234,7 @@ def run_health_checks(
     return HealthReport(overall=overall, checks=checks)
 
 
-def _unhealthy(
-    name: str, url: str, start: float, error: str, status_code: int | None = None
-) -> HealthCheckResult:
+def _unhealthy(name: str, url: str, start: float, error: str, status_code: int | None = None) -> HealthCheckResult:
     return HealthCheckResult(
         name=name,
         url=url,

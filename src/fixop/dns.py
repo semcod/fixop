@@ -34,24 +34,28 @@ def check_host_dns(ctx: HostContext, domain: str = TEST_DOMAIN) -> list[Issue]:
             resolv = run_remote(ctx, "cat /etc/resolv.conf 2>/dev/null | grep nameserver | head -3")
             nameservers = resolv.stdout.strip() if resolv.returncode == 0 else "unknown"
 
-            issues.append(Issue(
+            issues.append(
+                Issue(
+                    category=Category.DNS,
+                    severity=Severity.CRITICAL,
+                    message=f"Host DNS cannot resolve {domain}",
+                    fix_strategy=FixStrategy.CONFIRM,
+                    fix_command="echo 'nameserver 8.8.8.8' > /etc/resolv.conf && echo 'nameserver 1.1.1.1' >> /etc/resolv.conf",
+                    details=f"Current nameservers:\n{nameservers}",
+                    host=ctx.host,
+                )
+            )
+    except subprocess.TimeoutExpired:
+        issues.append(
+            Issue(
                 category=Category.DNS,
                 severity=Severity.CRITICAL,
-                message=f"Host DNS cannot resolve {domain}",
+                message=f"DNS check timed out on {ctx.host} — likely systemd-resolved is hanging",
                 fix_strategy=FixStrategy.CONFIRM,
-                fix_command=f"echo 'nameserver 8.8.8.8' > /etc/resolv.conf && echo 'nameserver 1.1.1.1' >> /etc/resolv.conf",
-                details=f"Current nameservers:\n{nameservers}",
+                fix_command="systemctl stop systemd-resolved && echo 'nameserver 8.8.8.8' > /etc/resolv.conf",
                 host=ctx.host,
-            ))
-    except subprocess.TimeoutExpired:
-        issues.append(Issue(
-            category=Category.DNS,
-            severity=Severity.CRITICAL,
-            message=f"DNS check timed out on {ctx.host} — likely systemd-resolved is hanging",
-            fix_strategy=FixStrategy.CONFIRM,
-            fix_command="systemctl stop systemd-resolved && echo 'nameserver 8.8.8.8' > /etc/resolv.conf",
-            host=ctx.host,
-        ))
+            )
+        )
     return issues
 
 
@@ -84,27 +88,31 @@ def check_container_dns(
             timeout=20,
         )
         if result.returncode != 0 or "timed out" in result.stdout.lower() or "NXDOMAIN" in result.stdout:
-            issues.append(Issue(
-                category=Category.DNS,
-                severity=Severity.CRITICAL,
-                message=f"Container '{container}' cannot resolve {domain} — ACME certs will fail",
-                fix_strategy=FixStrategy.CONFIRM,
-                fix_command=None,  # fix options below
-                details=(
-                    "Fix options (pick one):\n"
-                    f"  1. Switch to host network: set Network=host in {container}.container\n"
-                    "  2. Mount custom resolv.conf: Volume=./resolv.conf:/etc/resolv.conf:ro\n"
-                    "  3. Fix Podman DNS: add dns=8.8.8.8 to containers.conf"
-                ),
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.DNS,
+                    severity=Severity.CRITICAL,
+                    message=f"Container '{container}' cannot resolve {domain} — ACME certs will fail",
+                    fix_strategy=FixStrategy.CONFIRM,
+                    fix_command=None,  # fix options below
+                    details=(
+                        "Fix options (pick one):\n"
+                        f"  1. Switch to host network: set Network=host in {container}.container\n"
+                        "  2. Mount custom resolv.conf: Volume=./resolv.conf:/etc/resolv.conf:ro\n"
+                        "  3. Fix Podman DNS: add dns=8.8.8.8 to containers.conf"
+                    ),
+                    host=ctx.host,
+                )
+            )
     except subprocess.TimeoutExpired:
-        issues.append(Issue(
-            category=Category.DNS,
-            severity=Severity.ERROR,
-            message=f"DNS check timed out inside container '{container}' on {ctx.host}",
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.DNS,
+                severity=Severity.ERROR,
+                message=f"DNS check timed out inside container '{container}' on {ctx.host}",
+                host=ctx.host,
+            )
+        )
     return issues
 
 
@@ -120,19 +128,22 @@ def check_systemd_resolved(ctx: HostContext) -> list[Issue]:
         # It's running — check if it actually resolves
         test = run_remote(ctx, "resolvectl query google.com 2>&1 | head -3", timeout=10)
         if test.returncode != 0 or "no appropriate query" in test.stdout.lower():
-            issues.append(Issue(
-                category=Category.DNS,
-                severity=Severity.WARNING,
-                message=f"systemd-resolved is active but may not be resolving on {ctx.host}",
-                fix_strategy=FixStrategy.CONFIRM,
-                fix_command="systemctl stop systemd-resolved && systemctl disable systemd-resolved",
-                details="If disabled, you must set static nameservers in /etc/resolv.conf",
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.DNS,
+                    severity=Severity.WARNING,
+                    message=f"systemd-resolved is active but may not be resolving on {ctx.host}",
+                    fix_strategy=FixStrategy.CONFIRM,
+                    fix_command="systemctl stop systemd-resolved && systemctl disable systemd-resolved",
+                    details="If disabled, you must set static nameservers in /etc/resolv.conf",
+                    host=ctx.host,
+                )
+            )
     return issues
 
 
 # ── Fixes ──────────────────────────────────────────────
+
 
 def fix_resolv_conf(ctx: HostContext, nameservers: Optional[list[str]] = None) -> FixResult:
     """Write public DNS nameservers to /etc/resolv.conf on remote host."""
@@ -142,7 +153,8 @@ def fix_resolv_conf(ctx: HostContext, nameservers: Optional[list[str]] = None) -
     )
     result = run_remote(ctx, commands)
     issue = Issue(
-        category=Category.DNS, severity=Severity.CRITICAL,
+        category=Category.DNS,
+        severity=Severity.CRITICAL,
         message=f"Set /etc/resolv.conf to {', '.join(ns)} on {ctx.host}",
         host=ctx.host,
     )
@@ -165,7 +177,8 @@ def fix_disable_systemd_resolved(ctx: HostContext) -> FixResult:
     )
     result = run_remote(ctx, cmd)
     issue = Issue(
-        category=Category.DNS, severity=Severity.CRITICAL,
+        category=Category.DNS,
+        severity=Severity.CRITICAL,
         message=f"Disabled systemd-resolved and set static DNS on {ctx.host}",
         host=ctx.host,
     )

@@ -3,10 +3,12 @@
 ## Overview
 
 - **Project**: /home/tom/github/wronai/fixop
+- **Primary Language**: python
+- **Languages**: python: 20, shell: 1
 - **Analysis Mode**: static
 - **Total Functions**: 85
 - **Total Classes**: 9
-- **Modules**: 20
+- **Modules**: 21
 - **Entry Points**: 29
 
 ## Architecture by Module
@@ -23,13 +25,13 @@
 - **Functions**: 6
 - **File**: `ports.py`
 
-### src.fixop.dns
-- **Functions**: 6
-- **File**: `dns.py`
-
 ### src.fixop.deploy
 - **Functions**: 6
 - **File**: `deploy.py`
+
+### src.fixop.dns
+- **Functions**: 6
+- **File**: `dns.py`
 
 ### src.fixop.cli.fix_cmd
 - **Functions**: 6
@@ -43,14 +45,14 @@
 - **Functions**: 5
 - **File**: `systemd.py`
 
-### src.fixop.cli.output
-- **Functions**: 5
-- **File**: `output.py`
-
 ### src.fixop.health
 - **Functions**: 5
 - **Classes**: 2
 - **File**: `health.py`
+
+### src.fixop.cli.output
+- **Functions**: 5
+- **File**: `output.py`
 
 ### src.fixop.drift
 - **Functions**: 4
@@ -77,14 +79,14 @@
 - **Functions**: 2
 - **File**: `ssh.py`
 
-### src.fixop.cli.validate_cmd
-- **Functions**: 2
-- **File**: `validate_cmd.py`
-
 ### src.fixop.transport
 - **Functions**: 2
 - **Classes**: 1
 - **File**: `transport.py`
+
+### src.fixop.cli.validate_cmd
+- **Functions**: 2
+- **File**: `validate_cmd.py`
 
 ### src.fixop
 - **Functions**: 1
@@ -161,6 +163,14 @@ Quadlet files in /etc/containers/systemd/ are auto-converted to systemd units.
 > Add iptables NAT masquerade rule for container subnet.
 - **Calls**: src.fixop.transport.run_remote, Issue, FixResult, result.stdout.strip, result.stderr.strip
 
+### src.fixop.deploy.check_files_exist
+> Verify deploy files exist before upload (pre-SCP gate).
+
+Args:
+    file_patterns: Glob patterns relative to base_dir.
+    base_dir: Base directory to 
+- **Calls**: Path, list, base.glob, issues.append, Issue
+
 ### src.fixop.dns.fix_disable_systemd_resolved
 > Stop and disable systemd-resolved, then set static resolv.conf.
 - **Calls**: src.fixop.transport.run_remote, Issue, FixResult, result.stdout.strip, result.stderr.strip
@@ -171,14 +181,6 @@ Quadlet files in /etc/containers/systemd/ are auto-converted to systemd units.
 Used when container network doesn't have working DNS.
 Mount with: Volume=./resolv.conf:/etc/r
 - **Calls**: None.parent.mkdir, None.write_text, None.join, Path, Path
-
-### src.fixop.deploy.check_files_exist
-> Verify deploy files exist before upload (pre-SCP gate).
-
-Args:
-    file_patterns: Glob patterns relative to base_dir.
-    base_dir: Base directory to 
-- **Calls**: Path, list, base.glob, issues.append, Issue
 
 ### src.fixop.systemd.daemon_reload
 > Run systemctl daemon-reload on remote host.
@@ -303,15 +305,15 @@ fix_ufw_allow_routed [src.fixop.firewall]
 - **Methods**: 3
 - **Key Methods**: src.fixop.models.HostContext.ssh_cmd, src.fixop.models.HostContext.scp_cmd, src.fixop.models.HostContext.__str__
 
-### src.fixop.transport.RemoteResult
-> Result of a remote command execution.
-- **Methods**: 2
-- **Key Methods**: src.fixop.transport.RemoteResult.success, src.fixop.transport.RemoteResult.output
-
 ### src.fixop.health.HealthReport
 > Aggregated health check report.
 - **Methods**: 2
 - **Key Methods**: src.fixop.health.HealthReport.healthy_count, src.fixop.health.HealthReport.unhealthy_count
+
+### src.fixop.transport.RemoteResult
+> Result of a remote command execution.
+- **Methods**: 2
+- **Key Methods**: src.fixop.transport.RemoteResult.success, src.fixop.transport.RemoteResult.output
 
 ### src.fixop.models.Issue
 > A detected infrastructure problem.
@@ -386,33 +388,33 @@ Functions exposed as public API (no underscore prefix):
 - `src.fixop.tls.check_acme_readiness` - 14 calls
 - `src.fixop.systemd.check_unit_status` - 13 calls
 - `src.fixop.containers.check_containers_running` - 12 calls
-- `src.fixop.dns.check_container_dns` - 11 calls
 - `src.fixop.deploy.check_placeholders` - 11 calls
-- `src.fixop.ssh.check_ssh_key` - 11 calls
+- `src.fixop.dns.check_container_dns` - 11 calls
 - `src.fixop.health.check_ssh_service` - 11 calls
+- `src.fixop.ssh.check_ssh_key` - 11 calls
 - `src.fixop.cli.fix_cmd.cmd_fix` - 10 calls
 - `src.fixop.cli.check_cmd.cmd_check` - 9 calls
 - `src.fixop.cli.check_cmd.cmd_doctor` - 9 calls
+- `src.fixop.ports.who_uses_port` - 8 calls
 - `src.fixop.containers.check_disk_usage` - 8 calls
 - `src.fixop.containers.check_memory` - 8 calls
-- `src.fixop.ports.who_uses_port` - 8 calls
 - `src.fixop.dns.check_host_dns` - 8 calls
 - `src.fixop.dns.fix_resolv_conf` - 8 calls
 - `src.fixop.firewall.check_ufw_forward_policy` - 7 calls
-- `src.fixop.transport.test_ssh_connection` - 7 calls
 - `src.fixop.health.check_tcp_port` - 7 calls
 - `src.fixop.health.run_health_checks` - 7 calls
+- `src.fixop.transport.test_ssh_connection` - 7 calls
 - `src.fixop.ports.check_port` - 6 calls
 - `src.fixop.systemd.check_quadlet_loaded` - 6 calls
+- `src.fixop.ports.find_free_port_near` - 5 calls
 - `src.fixop.classify.extract_missing_binary` - 5 calls
 - `src.fixop.firewall.fix_ufw_allow_routed` - 5 calls
 - `src.fixop.firewall.fix_nat_masquerade` - 5 calls
-- `src.fixop.ports.find_free_port_near` - 5 calls
+- `src.fixop.deploy.check_unresolved_vars` - 5 calls
+- `src.fixop.deploy.check_files_exist` - 5 calls
 - `src.fixop.dns.check_systemd_resolved` - 5 calls
 - `src.fixop.dns.fix_disable_systemd_resolved` - 5 calls
 - `src.fixop.dns.generate_container_resolv_conf` - 5 calls
-- `src.fixop.deploy.check_unresolved_vars` - 5 calls
-- `src.fixop.deploy.check_files_exist` - 5 calls
 - `src.fixop.tls.check_certificate` - 5 calls
 
 ## System Interactions

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from fixop.classify import (
     classify_error,
@@ -110,6 +109,7 @@ class TestDispatchTables:
     def test_stderr_patterns_compile(self):
         """All stderr patterns should be valid regex."""
         import re
+
         for pattern, cat, msg, sev in STDERR_PATTERNS:
             compiled = re.compile(pattern, re.IGNORECASE)
             assert compiled is not None

@@ -23,15 +23,17 @@ def check_runtime(ctx: HostContext, runtime: str = "podman") -> list[Issue]:
 
     result = run_remote(ctx, f"{runtime} --version 2>/dev/null || echo NOT_FOUND")
     if "NOT_FOUND" in result.stdout or result.returncode != 0:
-        issues.append(Issue(
-            category=Category.CONTAINER,
-            severity=Severity.WARNING,
-            message=f"{runtime} not installed on {ctx.host}",
-            fix_strategy=FixStrategy.CONFIRM,
-            fix_command=f"apt-get update -qq && apt-get install -y -qq {runtime}",
-            details=f"Install {runtime} on the remote server to run containers.",
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.CONTAINER,
+                severity=Severity.WARNING,
+                message=f"{runtime} not installed on {ctx.host}",
+                fix_strategy=FixStrategy.CONFIRM,
+                fix_command=f"apt-get update -qq && apt-get install -y -qq {runtime}",
+                details=f"Install {runtime} on the remote server to run containers.",
+                host=ctx.host,
+            )
+        )
 
     return issues
 
@@ -54,12 +56,14 @@ def check_containers_running(
 
     result = run_remote(ctx, f"{runtime} ps --format '{{{{.Names}}}}' 2>/dev/null")
     if result.returncode != 0:
-        issues.append(Issue(
-            category=Category.CONTAINER,
-            severity=Severity.ERROR,
-            message=f"Cannot list containers on {ctx.host} — {runtime} may not be running",
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.CONTAINER,
+                severity=Severity.ERROR,
+                message=f"Cannot list containers on {ctx.host} — {runtime} may not be running",
+                host=ctx.host,
+            )
+        )
         return issues
 
     running = set(result.stdout.strip().splitlines())
@@ -71,23 +75,27 @@ def check_containers_running(
             status_info = check.stdout.strip() if check.returncode == 0 else ""
 
             if status_info:
-                issues.append(Issue(
-                    category=Category.CONTAINER,
-                    severity=Severity.ERROR,
-                    message=f"Container '{name}' exists but not running on {ctx.host}: {status_info}",
-                    fix_strategy=FixStrategy.CONFIRM,
-                    fix_command=f"{runtime} start {name}",
-                    host=ctx.host,
-                ))
+                issues.append(
+                    Issue(
+                        category=Category.CONTAINER,
+                        severity=Severity.ERROR,
+                        message=f"Container '{name}' exists but not running on {ctx.host}: {status_info}",
+                        fix_strategy=FixStrategy.CONFIRM,
+                        fix_command=f"{runtime} start {name}",
+                        host=ctx.host,
+                    )
+                )
             else:
-                issues.append(Issue(
-                    category=Category.CONTAINER,
-                    severity=Severity.WARNING,
-                    message=f"Container '{name}' not found on {ctx.host}",
-                    fix_strategy=FixStrategy.MANUAL,
-                    details=f"Deploy the container or check systemd unit: systemctl status {name}",
-                    host=ctx.host,
-                ))
+                issues.append(
+                    Issue(
+                        category=Category.CONTAINER,
+                        severity=Severity.WARNING,
+                        message=f"Container '{name}' not found on {ctx.host}",
+                        fix_strategy=FixStrategy.MANUAL,
+                        details=f"Deploy the container or check systemd unit: systemctl status {name}",
+                        host=ctx.host,
+                    )
+                )
 
     return issues
 
@@ -112,25 +120,29 @@ def check_disk_usage(ctx: HostContext, warn_mb: int = 500) -> list[Issue]:
         return issues
 
     if free_mb < 100:
-        issues.append(Issue(
-            category=Category.CONTAINER,
-            severity=Severity.CRITICAL,
-            message=f"Critical disk space on {ctx.host}: {free_mb}MB free",
-            fix_strategy=FixStrategy.MANUAL,
-            fix_command="podman system prune -af",
-            details="Immediately free disk space — clean unused images and containers.",
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.CONTAINER,
+                severity=Severity.CRITICAL,
+                message=f"Critical disk space on {ctx.host}: {free_mb}MB free",
+                fix_strategy=FixStrategy.MANUAL,
+                fix_command="podman system prune -af",
+                details="Immediately free disk space — clean unused images and containers.",
+                host=ctx.host,
+            )
+        )
     elif free_mb < warn_mb:
-        issues.append(Issue(
-            category=Category.CONTAINER,
-            severity=Severity.WARNING,
-            message=f"Low disk space on {ctx.host}: {free_mb}MB free",
-            fix_strategy=FixStrategy.MANUAL,
-            fix_command="podman system prune -af",
-            details="Free disk space before deploying — clean unused images.",
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.CONTAINER,
+                severity=Severity.WARNING,
+                message=f"Low disk space on {ctx.host}: {free_mb}MB free",
+                fix_strategy=FixStrategy.MANUAL,
+                fix_command="podman system prune -af",
+                details="Free disk space before deploying — clean unused images.",
+                host=ctx.host,
+            )
+        )
 
     return issues
 
@@ -158,13 +170,15 @@ def check_memory(ctx: HostContext, warn_percent: int = 90) -> list[Issue]:
 
     usage_pct = (used_mb * 100) // total_mb
     if usage_pct >= warn_percent:
-        issues.append(Issue(
-            category=Category.CONTAINER,
-            severity=Severity.WARNING,
-            message=f"High memory usage on {ctx.host}: {usage_pct}% ({used_mb}/{total_mb}MB)",
-            fix_strategy=FixStrategy.MANUAL,
-            details="Check for memory leaks or consider scaling up the server.",
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.CONTAINER,
+                severity=Severity.WARNING,
+                message=f"High memory usage on {ctx.host}: {usage_pct}% ({used_mb}/{total_mb}MB)",
+                fix_strategy=FixStrategy.MANUAL,
+                details="Check for memory leaks or consider scaling up the server.",
+                host=ctx.host,
+            )
+        )
 
     return issues

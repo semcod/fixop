@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-import pytest
 
-from fixop.ports import is_port_free, find_free_port_near, who_uses_port, is_container_process, check_port
+from fixop.ports import is_port_free, find_free_port_near, is_container_process, check_port
 from fixop.models import Category
 
 
@@ -65,9 +64,11 @@ class TestCheckPort:
             assert len(issues) == 0
 
     def test_occupied_port(self):
-        with patch("fixop.ports.is_port_free", return_value=False), \
-             patch("fixop.ports.who_uses_port", return_value=(1234, "nginx")), \
-             patch("fixop.ports.find_free_port_near", return_value=8081):
+        with (
+            patch("fixop.ports.is_port_free", return_value=False),
+            patch("fixop.ports.who_uses_port", return_value=(1234, "nginx")),
+            patch("fixop.ports.find_free_port_near", return_value=8081),
+        ):
             issues = check_port(8080)
             assert len(issues) == 1
             assert issues[0].category == Category.PORT

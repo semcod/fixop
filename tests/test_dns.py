@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -41,6 +41,7 @@ class TestCheckHostDns:
 
     def test_dns_timeout(self, ctx):
         import subprocess
+
         with patch("fixop.dns.run_remote") as mock:
             mock.side_effect = subprocess.TimeoutExpired(cmd="ssh", timeout=15)
             issues = check_host_dns(ctx)
@@ -58,8 +59,8 @@ class TestCheckContainerDns:
     def test_host_network_skip(self, ctx):
         with patch("fixop.dns.run_remote") as mock:
             mock.side_effect = [
-                RemoteResult(0, "true", ""),   # container running
-                RemoteResult(0, "host", ""),    # host network
+                RemoteResult(0, "true", ""),  # container running
+                RemoteResult(0, "host", ""),  # host network
             ]
             issues = check_container_dns(ctx, container="traefik")
             assert len(issues) == 0
@@ -67,8 +68,8 @@ class TestCheckContainerDns:
     def test_broken_container_dns(self, ctx):
         with patch("fixop.dns.run_remote") as mock:
             mock.side_effect = [
-                RemoteResult(0, "true", ""),     # container running
-                RemoteResult(0, "bridge", ""),   # bridge network
+                RemoteResult(0, "true", ""),  # container running
+                RemoteResult(0, "bridge", ""),  # bridge network
                 RemoteResult(1, "timed out", ""),  # DNS fails
             ]
             issues = check_container_dns(ctx, container="traefik")

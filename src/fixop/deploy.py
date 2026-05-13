@@ -17,13 +17,13 @@ from typing import Optional
 from .models import Category, FixStrategy, Issue, Severity
 
 # Patterns for unresolved variables
-_UNRESOLVED_VAR_RE = re.compile(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\}')
-_UNRESOLVED_TMPL_RE = re.compile(r'\{\{([A-Za-z_][A-Za-z0-9_]*)\}\}')
+_UNRESOLVED_VAR_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
+_UNRESOLVED_TMPL_RE = re.compile(r"\{\{([A-Za-z_][A-Za-z0-9_]*)\}\}")
 
 # Placeholder values that indicate unconfigured files
 _PLACEHOLDER_RE = re.compile(
-    r'(?:example\.com|your[-_]?domain|changeme|CHANGEME|your[-_]?email'
-    r'|TODO|FIXME|xxx+|placeholder|replace[-_]?me)',
+    r"(?:example\.com|your[-_]?domain|changeme|CHANGEME|your[-_]?email"
+    r"|TODO|FIXME|xxx+|placeholder|replace[-_]?me)",
     re.IGNORECASE,
 )
 
@@ -39,7 +39,10 @@ DEFAULT_DEPLOY_GLOBS = (
 
 
 def _scan_line_for_vars(
-    line: str, lineno: int, filepath: Path, extra_patterns: list[re.Pattern],
+    line: str,
+    lineno: int,
+    filepath: Path,
+    extra_patterns: list[re.Pattern],
 ) -> list[Issue]:
     """Match unresolved variables and extra patterns on a single line."""
     issues: list[Issue] = []
@@ -47,39 +50,46 @@ def _scan_line_for_vars(
 
     for m in _UNRESOLVED_VAR_RE.finditer(line):
         var_name = m.group(1)
-        issues.append(Issue(
-            category=Category.DEPLOY,
-            severity=Severity.WARNING,
-            message=f"Unresolved variable ${{{var_name}}} in {filepath.name}:{lineno}",
-            fix_strategy=FixStrategy.MANUAL,
-            details=f"Set {var_name} in your .env file, then regenerate deploy files. Line: {stripped[:120]}",
-        ))
+        issues.append(
+            Issue(
+                category=Category.DEPLOY,
+                severity=Severity.WARNING,
+                message=f"Unresolved variable ${{{var_name}}} in {filepath.name}:{lineno}",
+                fix_strategy=FixStrategy.MANUAL,
+                details=f"Set {var_name} in your .env file, then regenerate deploy files. Line: {stripped[:120]}",
+            )
+        )
 
     for m in _UNRESOLVED_TMPL_RE.finditer(line):
         var_name = m.group(1)
         if var_name.startswith("."):
             continue  # Skip Go template syntax like {{ .Name }}
-        issues.append(Issue(
-            category=Category.DEPLOY,
-            severity=Severity.WARNING,
-            message=f"Unresolved template {{{{{var_name}}}}} in {filepath.name}:{lineno}",
-            fix_strategy=FixStrategy.MANUAL,
-            details=f"Set {var_name} in your variables section. Line: {stripped[:120]}",
-        ))
+        issues.append(
+            Issue(
+                category=Category.DEPLOY,
+                severity=Severity.WARNING,
+                message=f"Unresolved template {{{{{var_name}}}}} in {filepath.name}:{lineno}",
+                fix_strategy=FixStrategy.MANUAL,
+                details=f"Set {var_name} in your variables section. Line: {stripped[:120]}",
+            )
+        )
 
     for pat in extra_patterns:
         if pat.search(line):
-            issues.append(Issue(
-                category=Category.DEPLOY,
-                severity=Severity.WARNING,
-                message=f"Pattern match in {filepath.name}:{lineno}: {stripped[:80]}",
-            ))
+            issues.append(
+                Issue(
+                    category=Category.DEPLOY,
+                    severity=Severity.WARNING,
+                    message=f"Pattern match in {filepath.name}:{lineno}: {stripped[:80]}",
+                )
+            )
 
     return issues
 
 
 def _scan_file_for_vars(
-    filepath: Path, extra_patterns: list[re.Pattern],
+    filepath: Path,
+    extra_patterns: list[re.Pattern],
 ) -> list[Issue]:
     """Scan a single file for unresolved variables."""
     try:
@@ -141,13 +151,15 @@ def check_placeholders(paths: list[str]) -> list[Issue]:
                 continue
 
             if _PLACEHOLDER_RE.search(stripped):
-                issues.append(Issue(
-                    category=Category.DEPLOY,
-                    severity=Severity.WARNING,
-                    message=f"Placeholder value in {filepath.name}:{lineno}: {stripped[:80]}",
-                    fix_strategy=FixStrategy.MANUAL,
-                    details="Replace placeholder values with real configuration before deploying.",
-                ))
+                issues.append(
+                    Issue(
+                        category=Category.DEPLOY,
+                        severity=Severity.WARNING,
+                        message=f"Placeholder value in {filepath.name}:{lineno}: {stripped[:80]}",
+                        fix_strategy=FixStrategy.MANUAL,
+                        details="Replace placeholder values with real configuration before deploying.",
+                    )
+                )
 
     return issues
 
@@ -165,13 +177,15 @@ def check_files_exist(file_patterns: list[str], base_dir: str = ".") -> list[Iss
     for pattern in file_patterns:
         matches = list(base.glob(pattern))
         if not matches:
-            issues.append(Issue(
-                category=Category.DEPLOY,
-                severity=Severity.ERROR,
-                message=f"No files matching '{pattern}' in {base_dir}",
-                fix_strategy=FixStrategy.MANUAL,
-                details="Generate deploy files before uploading. Check your build/generate step.",
-            ))
+            issues.append(
+                Issue(
+                    category=Category.DEPLOY,
+                    severity=Severity.ERROR,
+                    message=f"No files matching '{pattern}' in {base_dir}",
+                    fix_strategy=FixStrategy.MANUAL,
+                    details="Generate deploy files before uploading. Check your build/generate step.",
+                )
+            )
 
     return issues
 

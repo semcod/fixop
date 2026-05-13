@@ -78,16 +78,23 @@ def test_ssh_connection(
     """Quick SSH connectivity test — runs 'echo ok' on remote."""
     cmd = [
         "ssh",
-        "-o", f"ConnectTimeout={min(timeout, ctx.timeout)}",
-        "-o", "BatchMode=yes",
-        "-o", "StrictHostKeyChecking=accept-new",
-        "-p", str(ctx.port),
+        "-o",
+        f"ConnectTimeout={min(timeout, ctx.timeout)}",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "StrictHostKeyChecking=accept-new",
+        "-p",
+        str(ctx.port),
         f"{ctx.user}@{ctx.host}",
         "echo ok",
     ]
     try:
         result = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout + 5,
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout + 5,
         )
         return RemoteResult(
             returncode=result.returncode,

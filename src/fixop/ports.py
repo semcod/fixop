@@ -51,13 +51,17 @@ def who_uses_port(port: int) -> tuple[int | None, str | None]:
     try:
         result = subprocess.run(
             ["lsof", "-i", f":{port}", "-t"],
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if result.returncode == 0 and result.stdout.strip():
             pid = int(result.stdout.strip().split("\n")[0])
             ps = subprocess.run(
                 ["ps", "-p", str(pid), "-o", "comm="],
-                capture_output=True, text=True, timeout=5,
+                capture_output=True,
+                text=True,
+                timeout=5,
             )
             name = ps.stdout.strip() if ps.returncode == 0 else None
             return pid, name
@@ -92,14 +96,16 @@ def check_port(port: int) -> list[Issue]:
     suggested = find_free_port_near(port)
     details = f"Suggested alternative: {suggested}" if suggested else None
 
-    issues.append(Issue(
-        category=Category.PORT,
-        severity=Severity.WARNING,
-        message=msg,
-        fix_strategy=FixStrategy.CONFIRM if fix_cmd else FixStrategy.MANUAL,
-        fix_command=fix_cmd,
-        details=details,
-    ))
+    issues.append(
+        Issue(
+            category=Category.PORT,
+            severity=Severity.WARNING,
+            message=msg,
+            fix_strategy=FixStrategy.CONFIRM if fix_cmd else FixStrategy.MANUAL,
+            fix_command=fix_cmd,
+            details=details,
+        )
+    )
 
     return issues
 

@@ -51,7 +51,7 @@ def _apply_single(ctx: HostContext, issue: Issue) -> bool:
     print(f"  Fixing: {issue.message}")
     result = run_remote(ctx, issue.fix_command)
     if result.returncode == 0:
-        print(f"  ✅ Fixed")
+        print("  ✅ Fixed")
         return True
     print(f"  ❌ Failed: {result.stderr[:100]}")
     return False

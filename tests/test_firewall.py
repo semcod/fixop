@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from fixop.firewall import check_ufw_forward_policy, check_nat_masquerade
-from fixop.models import Category, HostContext, Severity
+from fixop.models import Category, HostContext
 from fixop.ssh import RemoteResult
 
 

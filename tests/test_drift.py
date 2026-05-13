@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import pytest
 
 from fixop.drift import check_file_drift, check_untracked_files, _extract_blocks
 from fixop.models import Severity
@@ -12,37 +9,37 @@ from fixop.models import Severity
 
 class TestExtractBlocks:
     def test_new_format(self):
-        text = '''# Project
+        text = """# Project
 
 ```yaml markpact:file path=deploy/traefik.yml
 entryPoints:
   web:
     address: ":80"
 ```
-'''
+"""
         blocks = _extract_blocks(text)
         assert "deploy/traefik.yml" in blocks
         assert 'address: ":80"' in blocks["deploy/traefik.yml"]
 
     def test_old_format(self):
-        text = '''```markpact:file path=main.py
+        text = """```markpact:file path=main.py
 print("hello")
 ```
-'''
+"""
         blocks = _extract_blocks(text)
         assert "main.py" in blocks
         assert blocks["main.py"] == 'print("hello")'
 
     def test_template_meta_ignored(self):
-        text = '''```yaml markpact:file path=.env template=true
+        text = """```yaml markpact:file path=.env template=true
 KEY=${ask:API Key}
 ```
-'''
+"""
         blocks = _extract_blocks(text)
         assert ".env" in blocks
 
     def test_multiple_blocks(self):
-        text = '''```yaml markpact:file path=a.yml
+        text = """```yaml markpact:file path=a.yml
 a: 1
 ```
 
@@ -51,7 +48,7 @@ Some text
 ```yaml markpact:file path=b.yml
 b: 2
 ```
-'''
+"""
         blocks = _extract_blocks(text)
         assert len(blocks) == 2
 
@@ -59,10 +56,10 @@ b: 2
 class TestCheckFileDrift:
     def test_no_drift(self, tmp_path):
         readme = tmp_path / "README.md"
-        readme.write_text('''```yaml markpact:file path=config.yml
+        readme.write_text("""```yaml markpact:file path=config.yml
 key: value
 ```
-''')
+""")
         target = tmp_path / "sandbox"
         target.mkdir()
         (target / "config.yml").write_text("key: value\n")
@@ -72,10 +69,10 @@ key: value
 
     def test_drifted_file(self, tmp_path):
         readme = tmp_path / "README.md"
-        readme.write_text('''```yaml markpact:file path=config.yml
+        readme.write_text("""```yaml markpact:file path=config.yml
 key: original
 ```
-''')
+""")
         target = tmp_path / "sandbox"
         target.mkdir()
         (target / "config.yml").write_text("key: modified\n")
@@ -87,10 +84,10 @@ key: original
 
     def test_missing_file(self, tmp_path):
         readme = tmp_path / "README.md"
-        readme.write_text('''```yaml markpact:file path=missing.yml
+        readme.write_text("""```yaml markpact:file path=missing.yml
 key: value
 ```
-''')
+""")
         target = tmp_path / "sandbox"
         target.mkdir()
 
@@ -111,11 +108,11 @@ key: value
 
     def test_ignore_whitespace(self, tmp_path):
         readme = tmp_path / "README.md"
-        readme.write_text('''```yaml markpact:file path=config.yml
+        readme.write_text("""```yaml markpact:file path=config.yml
 key: value   
 extra: data  
 ```
-''')
+""")
         target = tmp_path / "sandbox"
         target.mkdir()
         (target / "config.yml").write_text("key: value\nextra: data\n")
@@ -130,10 +127,10 @@ extra: data
 
     def test_nested_paths(self, tmp_path):
         readme = tmp_path / "README.md"
-        readme.write_text('''```yaml markpact:file path=deploy/sub/config.yml
+        readme.write_text("""```yaml markpact:file path=deploy/sub/config.yml
 nested: true
 ```
-''')
+""")
         target = tmp_path / "sandbox"
         (target / "deploy" / "sub").mkdir(parents=True)
         (target / "deploy" / "sub" / "config.yml").write_text("nested: true\n")
@@ -145,10 +142,10 @@ nested: true
 class TestCheckUntrackedFiles:
     def test_all_tracked(self, tmp_path):
         readme = tmp_path / "README.md"
-        readme.write_text('''```yaml markpact:file path=config.yml
+        readme.write_text("""```yaml markpact:file path=config.yml
 key: value
 ```
-''')
+""")
         target = tmp_path / "sandbox"
         target.mkdir()
         (target / "config.yml").write_text("key: value\n")
@@ -158,10 +155,10 @@ key: value
 
     def test_untracked_file(self, tmp_path):
         readme = tmp_path / "README.md"
-        readme.write_text('''```yaml markpact:file path=config.yml
+        readme.write_text("""```yaml markpact:file path=config.yml
 key: value
 ```
-''')
+""")
         target = tmp_path / "sandbox"
         target.mkdir()
         (target / "config.yml").write_text("key: value\n")
@@ -195,9 +192,9 @@ key: value
 
 
 class TestDriftCLI:
-
     def test_drift_cli_no_issues(self, tmp_path):
         from fixop.cli import main
+
         readme = tmp_path / "README.md"
         readme.write_text('```markpact:file path=app.py\nprint("hi")\n```\n')
         src = tmp_path / "sandbox"
@@ -209,6 +206,7 @@ class TestDriftCLI:
 
     def test_drift_cli_with_drift(self, tmp_path):
         from fixop.cli import main
+
         readme = tmp_path / "README.md"
         readme.write_text('```markpact:file path=app.py\nprint("old")\n```\n')
         src = tmp_path / "sandbox"
@@ -220,6 +218,7 @@ class TestDriftCLI:
 
     def test_drift_cli_untracked_flag(self, tmp_path):
         from fixop.cli import main
+
         readme = tmp_path / "README.md"
         readme.write_text("# No blocks\n")
         src = tmp_path / "sandbox"
@@ -231,6 +230,7 @@ class TestDriftCLI:
 
     def test_drift_cli_json_format(self, tmp_path, capsys):
         from fixop.cli import main
+
         readme = tmp_path / "README.md"
         readme.write_text('```markpact:file path=app.py\nprint("old")\n```\n')
         src = tmp_path / "sandbox"

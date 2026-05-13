@@ -1,0 +1,57 @@
+# code2llm | 21f 2696L | python:20,shell:1 | 2026-04-19
+# CC̄=4.3 | critical:0/85 | dups:0 | cycles:0
+
+HEALTH[0]: ok
+
+REFACTOR[0]: none needed
+
+PIPELINES[27]:
+  [1] Src [check_ports]: check_ports → check_port → is_port_free
+      PURITY: 100% pure
+  [2] Src [classify_error]: classify_error → _get_compiled_patterns
+      PURITY: 100% pure
+  [3] Src [get_tip_for_failure]: get_tip_for_failure
+      PURITY: 100% pure
+  [4] Src [extract_missing_binary]: extract_missing_binary
+      PURITY: 100% pure
+  [5] Src [check_nat_masquerade]: check_nat_masquerade → run_remote
+      PURITY: 100% pure
+
+LAYERS:
+  src/                            CC̄=4.3    ←in:3  →out:11  !! split
+  │ health                     245L  2C    5m  CC=11     ←0
+  │ deploy                     207L  0C    6m  CC=8      ←1
+  │ systemd                    206L  0C    5m  CC=10     ←1
+  │ drift                      194L  0C    4m  CC=11     ←1
+  │ dns                        194L  0C    6m  CC=9      ←1
+  │ tls                        192L  0C    7m  CC=10     ←2
+  │ containers                 170L  0C    4m  CC=7      ←1
+  │ classify                   161L  0C    5m  CC=10     ←0
+  │ ssh                        139L  0C    2m  CC=9      ←1
+  │ __init__                   139L  0C    8m  CC=4      ←0
+  │ firewall                   118L  0C    4m  CC=5      ←1
+  │ __init__                   116L  0C    1m  CC=7      ←2
+  │ ports                      112L  0C    6m  CC=7      ←0
+  │ models                     103L  6C    3m  CC=2      ←0
+  │ transport                  100L  1C    2m  CC=4      ←8
+  │ fix_cmd                     82L  0C    6m  CC=6      ←1
+  │ output                      77L  0C    5m  CC=9      ←3
+  │ check_cmd                   73L  0C    3m  CC=9      ←1
+  │ drift_cmd                   31L  0C    1m  CC=3      ←1
+  │ validate_cmd                27L  0C    2m  CC=3      ←1
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ project.sh                  10L  0C    0m  CC=0.0    ←0
+  │
+
+COUPLING:
+                   src  src.fixop
+        src         ──         11  !! fan-out
+  src.fixop          3         ──  hub
+  CYCLES: none
+  HUB: src.fixop/ (fan-in=11)
+  SMELL: src/ fan-out=11 → split needed
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

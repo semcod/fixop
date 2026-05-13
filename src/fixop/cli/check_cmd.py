@@ -30,7 +30,6 @@ def cmd_check(args) -> int:
 def cmd_doctor(args) -> int:
     """Full diagnostic + optional fix pipeline."""
     from .. import check_all
-    from ..transport import run_remote
 
     ctx = HostContext(host=args.host, user=args.user, port=args.port, key=args.key)
     domains = args.domains.split(",") if args.domains else None
@@ -66,7 +65,7 @@ def _apply_fixes(ctx: HostContext, issues) -> None:
         print(f"  Fixing: {issue.message}")
         result = run_remote(ctx, issue.fix_command)
         if result.returncode == 0:
-            print(f"  ✅ Done")
+            print("  ✅ Done")
             fixed += 1
         else:
             print(f"  ❌ Failed: {result.stderr[:100]}")

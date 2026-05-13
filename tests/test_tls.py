@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import socket
-import ssl
 from unittest.mock import patch, MagicMock
 
-import pytest
 
 from fixop.tls import check_certificate, check_certificates
-from fixop.models import Category, Severity
+from fixop.models import Severity
 
 
 class TestCheckCertificate:
@@ -19,8 +17,10 @@ class TestCheckCertificate:
             "issuer": ((("commonName", "Let's Encrypt"),),),
             "subject": ((("commonName", "example.com"),),),
         }
-        with patch("fixop.tls.socket.create_connection") as mock_conn, \
-             patch("fixop.tls.ssl.create_default_context") as mock_ctx:
+        with (
+            patch("fixop.tls.socket.create_connection") as mock_conn,
+            patch("fixop.tls.ssl.create_default_context") as mock_ctx,
+        ):
             mock_ssock = MagicMock()
             mock_ssock.getpeercert.return_value = mock_cert
             mock_ctx_inst = MagicMock()
@@ -39,8 +39,10 @@ class TestCheckCertificate:
             "issuer": ((("commonName", "example.com"),),),
             "subject": ((("commonName", "example.com"),),),
         }
-        with patch("fixop.tls.socket.create_connection") as mock_conn, \
-             patch("fixop.tls.ssl.create_default_context") as mock_ctx:
+        with (
+            patch("fixop.tls.socket.create_connection") as mock_conn,
+            patch("fixop.tls.ssl.create_default_context") as mock_ctx,
+        ):
             mock_ssock = MagicMock()
             mock_ssock.getpeercert.return_value = mock_cert
             mock_ctx_inst = MagicMock()
@@ -54,8 +56,7 @@ class TestCheckCertificate:
             assert any("Self-signed" in i.message for i in issues)
 
     def test_connection_refused(self):
-        with patch("fixop.tls.socket.create_connection") as mock_conn, \
-             patch("fixop.tls.ssl.create_default_context"):
+        with patch("fixop.tls.socket.create_connection") as mock_conn, patch("fixop.tls.ssl.create_default_context"):
             mock_conn.side_effect = ConnectionRefusedError("Connection refused")
             issues = check_certificate("example.com")
             assert len(issues) == 1
@@ -63,8 +64,7 @@ class TestCheckCertificate:
             assert "refused" in issues[0].message.lower()
 
     def test_timeout(self):
-        with patch("fixop.tls.socket.create_connection") as mock_conn, \
-             patch("fixop.tls.ssl.create_default_context"):
+        with patch("fixop.tls.socket.create_connection") as mock_conn, patch("fixop.tls.ssl.create_default_context"):
             mock_conn.side_effect = socket.timeout("timed out")
             issues = check_certificate("example.com")
             assert len(issues) == 1

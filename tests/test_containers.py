@@ -46,8 +46,8 @@ class TestCheckContainersRunning:
     def test_missing_container(self, ctx):
         with patch("fixop.containers.run_remote") as mock:
             mock.side_effect = [
-                RemoteResult(0, "traefik\n", ""),   # ps
-                RemoteResult(1, "", ""),              # ps -a for 'web'
+                RemoteResult(0, "traefik\n", ""),  # ps
+                RemoteResult(1, "", ""),  # ps -a for 'web'
             ]
             issues = check_containers_running(ctx, expected=["traefik", "web"])
             assert len(issues) == 1

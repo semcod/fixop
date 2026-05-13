@@ -35,18 +35,20 @@ def check_ufw_forward_policy(ctx: HostContext) -> list[Issue]:
 
     line = result.stdout.strip()
     if "DROP" in line.upper():
-        issues.append(Issue(
-            category=Category.FIREWALL,
-            severity=Severity.WARNING,
-            message=f"UFW DEFAULT_FORWARD_POLICY=DROP on {ctx.host} — containers cannot reach the internet",
-            fix_strategy=FixStrategy.CONFIRM,
-            fix_command='sed -i \'s/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/\' /etc/default/ufw && ufw reload',
-            details=(
-                "Podman and Docker containers need FORWARD=ACCEPT to pull images, "
-                "resolve DNS, and communicate across networks."
-            ),
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.FIREWALL,
+                severity=Severity.WARNING,
+                message=f"UFW DEFAULT_FORWARD_POLICY=DROP on {ctx.host} — containers cannot reach the internet",
+                fix_strategy=FixStrategy.CONFIRM,
+                fix_command='sed -i \'s/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/\' /etc/default/ufw && ufw reload',
+                details=(
+                    "Podman and Docker containers need FORWARD=ACCEPT to pull images, "
+                    "resolve DNS, and communicate across networks."
+                ),
+                host=ctx.host,
+            )
+        )
 
     return issues
 
@@ -60,18 +62,20 @@ def check_nat_masquerade(ctx: HostContext, subnet: str = "10.88.0.0/16") -> list
 
     result = run_remote(ctx, f"iptables -t nat -L POSTROUTING -n 2>/dev/null | grep -i masquerade | grep '{subnet}'")
     if result.returncode != 0 or not result.stdout.strip():
-        issues.append(Issue(
-            category=Category.FIREWALL,
-            severity=Severity.WARNING,
-            message=f"No NAT masquerade for container subnet {subnet} on {ctx.host}",
-            fix_strategy=FixStrategy.CONFIRM,
-            fix_command=f"iptables -t nat -A POSTROUTING -s {subnet} ! -d {subnet} -j MASQUERADE",
-            details=(
-                f"Containers on subnet {subnet} need NAT masquerade to reach external networks. "
-                "Without it, outbound traffic from containers is dropped."
-            ),
-            host=ctx.host,
-        ))
+        issues.append(
+            Issue(
+                category=Category.FIREWALL,
+                severity=Severity.WARNING,
+                message=f"No NAT masquerade for container subnet {subnet} on {ctx.host}",
+                fix_strategy=FixStrategy.CONFIRM,
+                fix_command=f"iptables -t nat -A POSTROUTING -s {subnet} ! -d {subnet} -j MASQUERADE",
+                details=(
+                    f"Containers on subnet {subnet} need NAT masquerade to reach external networks. "
+                    "Without it, outbound traffic from containers is dropped."
+                ),
+                host=ctx.host,
+            )
+        )
 
     return issues
 
@@ -81,10 +85,7 @@ def check_nat_masquerade(ctx: HostContext, subnet: str = "10.88.0.0/16") -> list
 
 def fix_ufw_allow_routed(ctx: HostContext) -> FixResult:
     """Set UFW DEFAULT_FORWARD_POLICY to ACCEPT and reload."""
-    cmd = (
-        'sed -i \'s/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/\' /etc/default/ufw '
-        "&& ufw reload"
-    )
+    cmd = 'sed -i \'s/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/\' /etc/default/ufw && ufw reload'
     result = run_remote(ctx, cmd)
     issue = Issue(
         category=Category.FIREWALL,

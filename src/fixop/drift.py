@@ -18,9 +18,7 @@ from .models import Category, FixStrategy, Issue, Severity
 
 # ─── Block parsing (minimal, standalone — no markpact dependency) ─────────────
 
-_BLOCK_RE = re.compile(
-    r"```(?:\w+\s+)?markpact:file\s+path=(\S+)[^\n]*\n([\s\S]*?)\n```"
-)
+_BLOCK_RE = re.compile(r"```(?:\w+\s+)?markpact:file\s+path=(\S+)[^\n]*\n([\s\S]*?)\n```")
 
 
 def _extract_blocks(readme_text: str) -> dict[str, str]:
@@ -70,11 +68,13 @@ def check_file_drift(
     issues: list[Issue] = []
 
     if not readme.exists():
-        issues.append(Issue(
-            category=Category.DEPLOY,
-            severity=Severity.ERROR,
-            message=f"README not found: {readme}",
-        ))
+        issues.append(
+            Issue(
+                category=Category.DEPLOY,
+                severity=Severity.ERROR,
+                message=f"README not found: {readme}",
+            )
+        )
         return issues
 
     text = readme.read_text(encoding="utf-8")
@@ -87,23 +87,27 @@ def check_file_drift(
         file_path = target / rel_path
 
         if not file_path.exists():
-            issues.append(Issue(
-                category=Category.DEPLOY,
-                severity=Severity.WARNING,
-                message=f"File defined in README but missing on disk: {rel_path}",
-                fix_strategy=FixStrategy.AUTO,
-                details=f"Run 'markpact {readme}' to extract, or remove the block from README.",
-            ))
+            issues.append(
+                Issue(
+                    category=Category.DEPLOY,
+                    severity=Severity.WARNING,
+                    message=f"File defined in README but missing on disk: {rel_path}",
+                    fix_strategy=FixStrategy.AUTO,
+                    details=f"Run 'markpact {readme}' to extract, or remove the block from README.",
+                )
+            )
             continue
 
         try:
             disk_content = file_path.read_text(encoding="utf-8").rstrip("\n")
         except Exception as e:
-            issues.append(Issue(
-                category=Category.DEPLOY,
-                severity=Severity.ERROR,
-                message=f"Cannot read file {rel_path}: {e}",
-            ))
+            issues.append(
+                Issue(
+                    category=Category.DEPLOY,
+                    severity=Severity.ERROR,
+                    message=f"Cannot read file {rel_path}: {e}",
+                )
+            )
             continue
 
         readme_content = readme_body.rstrip("\n")
@@ -117,20 +121,19 @@ def check_file_drift(
         if disk_content != readme_content:
             disk_hash = _sha256(disk_content)
             readme_hash = _sha256(readme_content)
-            issues.append(Issue(
-                category=Category.DEPLOY,
-                severity=Severity.WARNING,
-                message=(
-                    f"File drifted from README: {rel_path} "
-                    f"(disk:{disk_hash} ≠ readme:{readme_hash})"
-                ),
-                fix_strategy=FixStrategy.MANUAL,
-                details=(
-                    f"File on disk differs from markpact:file block in README.\n"
-                    f"To sync disk → README: markpact sync {readme}\n"
-                    f"To sync README → disk: markpact {readme}"
-                ),
-            ))
+            issues.append(
+                Issue(
+                    category=Category.DEPLOY,
+                    severity=Severity.WARNING,
+                    message=(f"File drifted from README: {rel_path} (disk:{disk_hash} ≠ readme:{readme_hash})"),
+                    fix_strategy=FixStrategy.MANUAL,
+                    details=(
+                        f"File on disk differs from markpact:file block in README.\n"
+                        f"To sync disk → README: markpact sync {readme}\n"
+                        f"To sync README → disk: markpact {readme}"
+                    ),
+                )
+            )
 
     return issues
 
@@ -159,9 +162,17 @@ def check_untracked_files(
         return issues
 
     default_exclude = {
-        ".venv", "venv", "node_modules", "__pycache__", ".git",
-        ".pytest_cache", ".mypy_cache", ".ruff_cache",
-        "build", "dist", ".egg-info",
+        ".venv",
+        "venv",
+        "node_modules",
+        "__pycache__",
+        ".git",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".ruff_cache",
+        "build",
+        "dist",
+        ".egg-info",
     }
     dirs_to_skip = exclude_dirs if exclude_dirs is not None else default_exclude
 
@@ -183,12 +194,14 @@ def check_untracked_files(
         summary = ", ".join(untracked[:5])
         if len(untracked) > 5:
             summary += f" (+{len(untracked) - 5} more)"
-        issues.append(Issue(
-            category=Category.DEPLOY,
-            severity=Severity.INFO,
-            message=f"{len(untracked)} file(s) in {target.name}/ not tracked in README: {summary}",
-            fix_strategy=FixStrategy.MANUAL,
-            details="Run 'markpact sync --missing' to see all untracked files.",
-        ))
+        issues.append(
+            Issue(
+                category=Category.DEPLOY,
+                severity=Severity.INFO,
+                message=f"{len(untracked)} file(s) in {target.name}/ not tracked in README: {summary}",
+                fix_strategy=FixStrategy.MANUAL,
+                details="Run 'markpact sync --missing' to see all untracked files.",
+            )
+        )
 
     return issues

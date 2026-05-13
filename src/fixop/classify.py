@@ -11,13 +11,13 @@ from __future__ import annotations
 
 import re
 
-from .models import Category, FixStrategy, Issue, Severity
+from .models import Category, Issue, Severity
 
 # ── Exit code dispatch table ──────────────────────────
 
 EXIT_CODE_MAP: dict[int, tuple[Category, str, Severity]] = {
-    1:   (Category.CONTAINER, "General error", Severity.ERROR),
-    2:   (Category.DEPLOY, "Misuse of shell command", Severity.ERROR),
+    1: (Category.CONTAINER, "General error", Severity.ERROR),
+    2: (Category.DEPLOY, "Misuse of shell command", Severity.ERROR),
     124: (Category.CONTAINER, "Command timed out", Severity.ERROR),
     126: (Category.DEPLOY, "Permission denied or not executable", Severity.ERROR),
     127: (Category.DEPLOY, "Command not found", Severity.ERROR),
@@ -51,10 +51,7 @@ _COMPILED_PATTERNS: list[tuple[re.Pattern, Category, str, Severity]] | None = No
 def _get_compiled_patterns() -> list[tuple[re.Pattern, Category, str, Severity]]:
     global _COMPILED_PATTERNS
     if _COMPILED_PATTERNS is None:
-        _COMPILED_PATTERNS = [
-            (re.compile(pat, re.IGNORECASE), cat, msg, sev)
-            for pat, cat, msg, sev in STDERR_PATTERNS
-        ]
+        _COMPILED_PATTERNS = [(re.compile(pat, re.IGNORECASE), cat, msg, sev) for pat, cat, msg, sev in STDERR_PATTERNS]
     return _COMPILED_PATTERNS
 
 
@@ -113,10 +110,7 @@ def get_tip_for_failure(cmd: str, exit_code: int) -> str | None:
     cmd_lower = cmd.lower()
 
     if exit_code == 1 and ("scp" in cmd_lower or "rsync" in cmd_lower):
-        return (
-            "Missing files? Check that deploy artifacts exist before uploading. "
-            "Run: fixop validate deploy/"
-        )
+        return "Missing files? Check that deploy artifacts exist before uploading. Run: fixop validate deploy/"
 
     if exit_code == 255 and ("ssh" in cmd_lower or "scp" in cmd_lower):
         return (
@@ -128,17 +122,11 @@ def get_tip_for_failure(cmd: str, exit_code: int) -> str | None:
 
     if exit_code == 126:
         return (
-            "Permission denied. Check:\n"
-            "- Script is executable: chmod +x scripts/*.sh\n"
-            "- Correct path in script field"
+            "Permission denied. Check:\n- Script is executable: chmod +x scripts/*.sh\n- Correct path in script field"
         )
 
     if exit_code == 127:
-        return (
-            "Command not found. Check:\n"
-            "- Tool is installed: which <command>\n"
-            "- PATH includes the tool's directory"
-        )
+        return "Command not found. Check:\n- Tool is installed: which <command>\n- PATH includes the tool's directory"
 
     return None
 
@@ -158,4 +146,4 @@ def _truncate(s: str, max_len: int) -> str:
     s = s.strip()
     if len(s) <= max_len:
         return s
-    return s[:max_len - 3] + "..."
+    return s[: max_len - 3] + "..."

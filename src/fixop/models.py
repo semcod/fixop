@@ -6,7 +6,7 @@ and FixResult from fix_*() functions.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
@@ -30,10 +30,10 @@ class Category(Enum):
 
 
 class FixStrategy(Enum):
-    AUTO = "auto"        # fixop can fix without confirmation
+    AUTO = "auto"  # fixop can fix without confirmation
     CONFIRM = "confirm"  # needs user confirmation
-    MANUAL = "manual"    # provides instructions only
-    SKIP = "skip"        # informational, no fix needed
+    MANUAL = "manual"  # provides instructions only
+    SKIP = "skip"  # informational, no fix needed
 
 
 @dataclass
@@ -82,10 +82,14 @@ class HostContext:
         """Base SSH command args (without the remote command)."""
         return [
             "ssh",
-            "-p", str(self.port),
-            "-i", self.key,
-            "-o", "StrictHostKeyChecking=accept-new",
-            "-o", f"ConnectTimeout={self.timeout}",
+            "-p",
+            str(self.port),
+            "-i",
+            self.key,
+            "-o",
+            "StrictHostKeyChecking=accept-new",
+            "-o",
+            f"ConnectTimeout={self.timeout}",
             f"{self.user}@{self.host}",
         ]
 
@@ -94,9 +98,12 @@ class HostContext:
         """Base SCP command args."""
         return [
             "scp",
-            "-P", str(self.port),
-            "-i", self.key,
-            "-o", "StrictHostKeyChecking=accept-new",
+            "-P",
+            str(self.port),
+            "-i",
+            self.key,
+            "-o",
+            "StrictHostKeyChecking=accept-new",
         ]
 
     def __str__(self) -> str:

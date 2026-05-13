@@ -1,0 +1,864 @@
+project: /home/tom/github/wronai/fixop
+generated_from: code2llm call graph analysis
+stats:
+  total_nodes: 73
+  total_edges: 74
+  modules_count: 19
+nodes:
+  src.fixop.dns.fix_resolv_conf:
+    name: fix_resolv_conf
+    module: src.fixop.dns
+    line: 137
+    cyclomatic_complexity: 4
+    calls_out: 8
+    calls_in: 0
+  src.fixop.firewall.check_ufw_forward_policy:
+    name: check_ufw_forward_policy
+    module: src.fixop.firewall
+    line: 17
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 1
+  src.fixop.cli.fix_cmd._apply_all:
+    name: _apply_all
+    module: src.fixop.cli.fix_cmd
+    line: 60
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 1
+  src.fixop.dns.check_container_dns:
+    name: check_container_dns
+    module: src.fixop.dns
+    line: 58
+    cyclomatic_complexity: 9
+    calls_out: 11
+    calls_in: 1
+  src.fixop.tls._validate_issuer:
+    name: _validate_issuer
+    module: src.fixop.tls
+    line: 57
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  src.fixop.ports.check_ports:
+    name: check_ports
+    module: src.fixop.ports
+    line: 107
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 0
+  src.fixop.classify.classify_error:
+    name: classify_error
+    module: src.fixop.classify
+    line: 61
+    cyclomatic_complexity: 10
+    calls_out: 14
+    calls_in: 0
+  src.fixop.cli.drift_cmd.cmd_drift:
+    name: cmd_drift
+    module: src.fixop.cli.drift_cmd
+    line: 15
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.fixop.cli.fix_cmd.cmd_fix:
+    name: cmd_fix
+    module: src.fixop.cli.fix_cmd
+    line: 12
+    cyclomatic_complexity: 6
+    calls_out: 10
+    calls_in: 1
+  src.fixop.tls._handle_connection_error:
+    name: _handle_connection_error
+    module: src.fixop.tls
+    line: 72
+    cyclomatic_complexity: 5
+    calls_out: 12
+    calls_in: 1
+  src.fixop.health.check_ssh_service:
+    name: check_ssh_service
+    module: src.fixop.health
+    line: 109
+    cyclomatic_complexity: 6
+    calls_out: 11
+    calls_in: 1
+  src.fixop.cli.fix_cmd._report_fixes:
+    name: _report_fixes
+    module: src.fixop.cli.fix_cmd
+    line: 79
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  src.fixop.cli._dispatch_drift:
+    name: _dispatch_drift
+    module: src.fixop.cli
+    line: 128
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.fixop.cli.validate_cmd.cmd_validate:
+    name: cmd_validate
+    module: src.fixop.cli.validate_cmd
+    line: 12
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.fixop.health._unhealthy:
+    name: _unhealthy
+    module: src.fixop.health
+    line: 235
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  src.fixop.health.run_health_checks:
+    name: run_health_checks
+    module: src.fixop.health
+    line: 202
+    cyclomatic_complexity: 10
+    calls_out: 7
+    calls_in: 0
+  src.fixop.containers.check_containers_running:
+    name: check_containers_running
+    module: src.fixop.containers
+    line: 39
+    cyclomatic_complexity: 7
+    calls_out: 12
+    calls_in: 1
+  src.fixop.ssh.check_ssh_connectivity:
+    name: check_ssh_connectivity
+    module: src.fixop.ssh
+    line: 58
+    cyclomatic_complexity: 9
+    calls_out: 19
+    calls_in: 1
+  src.fixop.cli.output.output_issues:
+    name: output_issues
+    module: src.fixop.cli.output
+    line: 14
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 5
+  src.fixop.cli.output._group_by_category:
+    name: _group_by_category
+    module: src.fixop.cli.output
+    line: 64
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.fixop.deploy.scan_deploy_dir:
+    name: scan_deploy_dir
+    module: src.fixop.deploy
+    line: 179
+    cyclomatic_complexity: 6
+    calls_out: 14
+    calls_in: 1
+  src.fixop.ports.who_uses_port:
+    name: who_uses_port
+    module: src.fixop.ports
+    line: 46
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  src.fixop.check_all:
+    name: check_all
+    module: src.fixop
+    line: 46
+    cyclomatic_complexity: 7
+    calls_out: 22
+    calls_in: 3
+  src.fixop.health.check_http_endpoint:
+    name: check_http_endpoint
+    module: src.fixop.health
+    line: 54
+    cyclomatic_complexity: 11
+    calls_out: 20
+    calls_in: 1
+  src.fixop.drift.check_untracked_files:
+    name: check_untracked_files
+    module: src.fixop.drift
+    line: 138
+    cyclomatic_complexity: 11
+    calls_out: 21
+    calls_in: 1
+  src.fixop.deploy._scan_line_for_vars:
+    name: _scan_line_for_vars
+    module: src.fixop.deploy
+    line: 41
+    cyclomatic_complexity: 6
+    calls_out: 13
+    calls_in: 1
+  src.fixop.tls._validate_expiry:
+    name: _validate_expiry
+    module: src.fixop.tls
+    line: 30
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 1
+  src.fixop.cli.output._format_json:
+    name: _format_json
+    module: src.fixop.cli.output
+    line: 22
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  src.fixop.transport.test_ssh_connection:
+    name: test_ssh_connection
+    module: src.fixop.transport
+    line: 74
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 1
+  src.fixop.cli._dispatch_check_tls:
+    name: _dispatch_check_tls
+    module: src.fixop.cli
+    line: 123
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.fixop.ports.find_free_port_near:
+    name: find_free_port_near
+    module: src.fixop.ports
+    line: 31
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.fixop.cli.check_cmd._apply_fixes:
+    name: _apply_fixes
+    module: src.fixop.cli.check_cmd
+    line: 55
+    cyclomatic_complexity: 7
+    calls_out: 8
+    calls_in: 1
+  src.fixop.classify._get_compiled_patterns:
+    name: _get_compiled_patterns
+    module: src.fixop.classify
+    line: 51
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 1
+  src.fixop.containers.check_runtime:
+    name: check_runtime
+    module: src.fixop.containers
+    line: 20
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.fixop.systemd.check_quadlet_loaded:
+    name: check_quadlet_loaded
+    module: src.fixop.systemd
+    line: 78
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 0
+  src.fixop.firewall.fix_ufw_allow_routed:
+    name: fix_ufw_allow_routed
+    module: src.fixop.firewall
+    line: 82
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 0
+  src.fixop.transport.run_remote:
+    name: run_remote
+    module: src.fixop.transport
+    line: 36
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 20
+  src.fixop.deploy.check_placeholders:
+    name: check_placeholders
+    module: src.fixop.deploy
+    line: 121
+    cyclomatic_complexity: 8
+    calls_out: 11
+    calls_in: 1
+  src.fixop.systemd.check_unit_status:
+    name: check_unit_status
+    module: src.fixop.systemd
+    line: 21
+    cyclomatic_complexity: 10
+    calls_out: 13
+    calls_in: 1
+  src.fixop.drift.check_file_drift:
+    name: check_file_drift
+    module: src.fixop.drift
+    line: 48
+    cyclomatic_complexity: 10
+    calls_out: 26
+    calls_in: 1
+  src.fixop.tls.check_acme_readiness:
+    name: check_acme_readiness
+    module: src.fixop.tls
+    line: 135
+    cyclomatic_complexity: 10
+    calls_out: 14
+    calls_in: 0
+  src.fixop.cli.fix_cmd._confirm_fix:
+    name: _confirm_fix
+    module: src.fixop.cli.fix_cmd
+    line: 39
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 1
+  src.fixop.cli.fix_cmd._apply_single:
+    name: _apply_single
+    module: src.fixop.cli.fix_cmd
+    line: 47
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  src.fixop.deploy.check_unresolved_vars:
+    name: check_unresolved_vars
+    module: src.fixop.deploy
+    line: 99
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.fixop.cli.output._format_text:
+    name: _format_text
+    module: src.fixop.cli.output
+    line: 39
+    cyclomatic_complexity: 9
+    calls_out: 13
+    calls_in: 1
+  src.fixop.dns.check_host_dns:
+    name: check_host_dns
+    module: src.fixop.dns
+    line: 24
+    cyclomatic_complexity: 6
+    calls_out: 8
+    calls_in: 1
+  src.fixop.cli.output._summarize:
+    name: _summarize
+    module: src.fixop.cli.output
+    line: 72
+    cyclomatic_complexity: 7
+    calls_out: 3
+    calls_in: 1
+  src.fixop.cli.fix_cmd._discover_fixable:
+    name: _discover_fixable
+    module: src.fixop.cli.fix_cmd
+    line: 34
+    cyclomatic_complexity: 4
+    calls_out: 0
+    calls_in: 1
+  src.fixop.ports.is_port_free:
+    name: is_port_free
+    module: src.fixop.ports
+    line: 20
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 2
+  src.fixop.cli.check_cmd.cmd_check:
+    name: cmd_check
+    module: src.fixop.cli.check_cmd
+    line: 12
+    cyclomatic_complexity: 9
+    calls_out: 9
+    calls_in: 1
+  src.fixop.dns.check_systemd_resolved:
+    name: check_systemd_resolved
+    module: src.fixop.dns
+    line: 111
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.fixop.tls._connect_and_get_cert:
+    name: _connect_and_get_cert
+    module: src.fixop.tls
+    line: 22
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 1
+  src.fixop.ports.check_port:
+    name: check_port
+    module: src.fixop.ports
+    line: 76
+    cyclomatic_complexity: 7
+    calls_out: 6
+    calls_in: 1
+  src.fixop.cli.validate_cmd.cmd_check_tls:
+    name: cmd_check_tls
+    module: src.fixop.cli.validate_cmd
+    line: 21
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.fixop.ports.is_container_process:
+    name: is_container_process
+    module: src.fixop.ports
+    line: 69
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.fixop.containers.check_memory:
+    name: check_memory
+    module: src.fixop.containers
+    line: 138
+    cyclomatic_complexity: 6
+    calls_out: 8
+    calls_in: 1
+  src.fixop.tls.check_certificates:
+    name: check_certificates
+    module: src.fixop.tls
+    line: 127
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
+  src.fixop.systemd.daemon_reload:
+    name: daemon_reload
+    module: src.fixop.systemd
+    line: 117
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 0
+  src.fixop.systemd.graceful_restart_all:
+    name: graceful_restart_all
+    module: src.fixop.systemd
+    line: 191
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  src.fixop.deploy._scan_file_for_vars:
+    name: _scan_file_for_vars
+    module: src.fixop.deploy
+    line: 81
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  src.fixop.cli._dispatch_doctor:
+    name: _dispatch_doctor
+    module: src.fixop.cli
+    line: 133
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.fixop.firewall.check_nat_masquerade:
+    name: check_nat_masquerade
+    module: src.fixop.firewall
+    line: 54
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 0
+  src.fixop.cli._dispatch_validate:
+    name: _dispatch_validate
+    module: src.fixop.cli
+    line: 118
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.fixop.containers.check_disk_usage:
+    name: check_disk_usage
+    module: src.fixop.containers
+    line: 95
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  src.fixop.cli.check_cmd.cmd_doctor:
+    name: cmd_doctor
+    module: src.fixop.cli.check_cmd
+    line: 30
+    cyclomatic_complexity: 8
+    calls_out: 9
+    calls_in: 1
+  src.fixop.tls.check_certificate:
+    name: check_certificate
+    module: src.fixop.tls
+    line: 104
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  src.fixop.firewall.fix_nat_masquerade:
+    name: fix_nat_masquerade
+    module: src.fixop.firewall
+    line: 103
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 0
+  src.fixop.systemd.graceful_restart:
+    name: graceful_restart
+    module: src.fixop.systemd
+    line: 134
+    cyclomatic_complexity: 6
+    calls_out: 18
+    calls_in: 1
+  src.fixop.classify._truncate:
+    name: _truncate
+    module: src.fixop.classify
+    line: 156
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.fixop.dns.fix_disable_systemd_resolved:
+    name: fix_disable_systemd_resolved
+    module: src.fixop.dns
+    line: 157
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 0
+  src.fixop.cli._dispatch_fix:
+    name: _dispatch_fix
+    module: src.fixop.cli
+    line: 113
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.fixop.cli._dispatch_check:
+    name: _dispatch_check
+    module: src.fixop.cli
+    line: 108
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.fixop.drift._extract_blocks:
+    name: _extract_blocks
+    module: src.fixop.drift
+    line: 26
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 2
+edges:
+- caller: src.fixop.ports.find_free_port_near
+  callee: src.fixop.ports.is_port_free
+  call_type: resolved
+- caller: src.fixop.ports.check_port
+  callee: src.fixop.ports.is_port_free
+  call_type: resolved
+- caller: src.fixop.ports.check_port
+  callee: src.fixop.ports.who_uses_port
+  call_type: resolved
+- caller: src.fixop.ports.check_port
+  callee: src.fixop.ports.find_free_port_near
+  call_type: resolved
+- caller: src.fixop.ports.check_port
+  callee: src.fixop.ports.is_container_process
+  call_type: resolved
+- caller: src.fixop.ports.check_ports
+  callee: src.fixop.ports.check_port
+  call_type: resolved
+- caller: src.fixop.drift.check_file_drift
+  callee: src.fixop.drift._extract_blocks
+  call_type: resolved
+- caller: src.fixop.classify.classify_error
+  callee: src.fixop.classify._get_compiled_patterns
+  call_type: resolved
+- caller: src.fixop.classify.classify_error
+  callee: src.fixop.classify._truncate
+  call_type: resolved
+- caller: src.fixop.check_all
+  callee: src.fixop.ssh.check_ssh_connectivity
+  call_type: resolved
+- caller: src.fixop.check_all
+  callee: src.fixop.dns.check_host_dns
+  call_type: resolved
+- caller: src.fixop.check_all
+  callee: src.fixop.dns.check_systemd_resolved
+  call_type: resolved
+- caller: src.fixop.containers.check_runtime
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.containers.check_containers_running
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.containers.check_disk_usage
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.containers.check_memory
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.firewall.check_ufw_forward_policy
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.firewall.check_nat_masquerade
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.firewall.fix_ufw_allow_routed
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.firewall.fix_nat_masquerade
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.deploy._scan_file_for_vars
+  callee: src.fixop.deploy._scan_line_for_vars
+  call_type: resolved
+- caller: src.fixop.deploy.check_unresolved_vars
+  callee: src.fixop.deploy._scan_file_for_vars
+  call_type: resolved
+- caller: src.fixop.deploy.scan_deploy_dir
+  callee: src.fixop.deploy.check_unresolved_vars
+  call_type: resolved
+- caller: src.fixop.deploy.scan_deploy_dir
+  callee: src.fixop.deploy.check_placeholders
+  call_type: resolved
+- caller: src.fixop.dns.check_host_dns
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.dns.check_container_dns
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.dns.check_systemd_resolved
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.dns.fix_resolv_conf
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.dns.fix_disable_systemd_resolved
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.tls.check_certificate
+  callee: src.fixop.tls._connect_and_get_cert
+  call_type: resolved
+- caller: src.fixop.tls.check_certificate
+  callee: src.fixop.tls._validate_expiry
+  call_type: resolved
+- caller: src.fixop.tls.check_certificate
+  callee: src.fixop.tls._validate_issuer
+  call_type: resolved
+- caller: src.fixop.tls.check_certificate
+  callee: src.fixop.tls._handle_connection_error
+  call_type: resolved
+- caller: src.fixop.tls.check_certificates
+  callee: src.fixop.tls.check_certificate
+  call_type: resolved
+- caller: src.fixop.tls.check_acme_readiness
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.systemd.check_unit_status
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.systemd.check_quadlet_loaded
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.systemd.daemon_reload
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.systemd.graceful_restart
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.systemd.graceful_restart_all
+  callee: src.fixop.systemd.graceful_restart
+  call_type: resolved
+- caller: src.fixop.health.check_http_endpoint
+  callee: src.fixop.health._unhealthy
+  call_type: resolved
+- caller: src.fixop.health.run_health_checks
+  callee: src.fixop.health.check_ssh_service
+  call_type: resolved
+- caller: src.fixop.health.run_health_checks
+  callee: src.fixop.health.check_http_endpoint
+  call_type: resolved
+- caller: src.fixop.ssh.check_ssh_connectivity
+  callee: src.fixop.transport.test_ssh_connection
+  call_type: resolved
+- caller: src.fixop.cli.output.output_issues
+  callee: src.fixop.cli.output._format_json
+  call_type: resolved
+- caller: src.fixop.cli.output.output_issues
+  callee: src.fixop.cli.output._format_text
+  call_type: resolved
+- caller: src.fixop.cli.output._format_text
+  callee: src.fixop.cli.output._group_by_category
+  call_type: resolved
+- caller: src.fixop.cli.output._format_text
+  callee: src.fixop.cli.output._summarize
+  call_type: resolved
+- caller: src.fixop.cli.fix_cmd.cmd_fix
+  callee: src.fixop.check_all
+  call_type: resolved
+- caller: src.fixop.cli.fix_cmd.cmd_fix
+  callee: src.fixop.cli.fix_cmd._discover_fixable
+  call_type: resolved
+- caller: src.fixop.cli.fix_cmd.cmd_fix
+  callee: src.fixop.cli.fix_cmd._apply_all
+  call_type: resolved
+- caller: src.fixop.cli.fix_cmd.cmd_fix
+  callee: src.fixop.cli.fix_cmd._report_fixes
+  call_type: resolved
+- caller: src.fixop.cli.fix_cmd._apply_single
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+- caller: src.fixop.cli.fix_cmd._apply_all
+  callee: src.fixop.cli.fix_cmd._apply_single
+  call_type: resolved
+- caller: src.fixop.cli.fix_cmd._apply_all
+  callee: src.fixop.cli.fix_cmd._confirm_fix
+  call_type: resolved
+- caller: src.fixop.cli._dispatch_check
+  callee: src.fixop.cli.check_cmd.cmd_check
+  call_type: resolved
+- caller: src.fixop.cli._dispatch_fix
+  callee: src.fixop.cli.fix_cmd.cmd_fix
+  call_type: resolved
+- caller: src.fixop.cli._dispatch_validate
+  callee: src.fixop.cli.validate_cmd.cmd_validate
+  call_type: resolved
+- caller: src.fixop.cli._dispatch_check_tls
+  callee: src.fixop.cli.validate_cmd.cmd_check_tls
+  call_type: resolved
+- caller: src.fixop.cli._dispatch_drift
+  callee: src.fixop.cli.drift_cmd.cmd_drift
+  call_type: resolved
+- caller: src.fixop.cli._dispatch_doctor
+  callee: src.fixop.cli.check_cmd.cmd_doctor
+  call_type: resolved
+- caller: src.fixop.cli.drift_cmd.cmd_drift
+  callee: src.fixop.drift.check_file_drift
+  call_type: resolved
+- caller: src.fixop.cli.drift_cmd.cmd_drift
+  callee: src.fixop.cli.output.output_issues
+  call_type: resolved
+- caller: src.fixop.cli.drift_cmd.cmd_drift
+  callee: src.fixop.drift.check_untracked_files
+  call_type: resolved
+- caller: src.fixop.cli.validate_cmd.cmd_validate
+  callee: src.fixop.deploy.scan_deploy_dir
+  call_type: resolved
+- caller: src.fixop.cli.validate_cmd.cmd_validate
+  callee: src.fixop.cli.output.output_issues
+  call_type: resolved
+- caller: src.fixop.cli.validate_cmd.cmd_check_tls
+  callee: src.fixop.tls.check_certificates
+  call_type: resolved
+- caller: src.fixop.cli.validate_cmd.cmd_check_tls
+  callee: src.fixop.cli.output.output_issues
+  call_type: resolved
+- caller: src.fixop.cli.check_cmd.cmd_check
+  callee: src.fixop.check_all
+  call_type: resolved
+- caller: src.fixop.cli.check_cmd.cmd_check
+  callee: src.fixop.cli.output.output_issues
+  call_type: resolved
+- caller: src.fixop.cli.check_cmd.cmd_doctor
+  callee: src.fixop.check_all
+  call_type: resolved
+- caller: src.fixop.cli.check_cmd.cmd_doctor
+  callee: src.fixop.cli.output.output_issues
+  call_type: resolved
+- caller: src.fixop.cli.check_cmd.cmd_doctor
+  callee: src.fixop.cli.check_cmd._apply_fixes
+  call_type: resolved
+- caller: src.fixop.cli.check_cmd._apply_fixes
+  callee: src.fixop.transport.run_remote
+  call_type: resolved
+modules:
+  src.fixop:
+  - src.fixop.check_all
+  src.fixop.classify:
+  - src.fixop.classify._get_compiled_patterns
+  - src.fixop.classify._truncate
+  - src.fixop.classify.classify_error
+  src.fixop.cli:
+  - src.fixop.cli._dispatch_check
+  - src.fixop.cli._dispatch_check_tls
+  - src.fixop.cli._dispatch_doctor
+  - src.fixop.cli._dispatch_drift
+  - src.fixop.cli._dispatch_fix
+  - src.fixop.cli._dispatch_validate
+  src.fixop.cli.check_cmd:
+  - src.fixop.cli.check_cmd._apply_fixes
+  - src.fixop.cli.check_cmd.cmd_check
+  - src.fixop.cli.check_cmd.cmd_doctor
+  src.fixop.cli.drift_cmd:
+  - src.fixop.cli.drift_cmd.cmd_drift
+  src.fixop.cli.fix_cmd:
+  - src.fixop.cli.fix_cmd._apply_all
+  - src.fixop.cli.fix_cmd._apply_single
+  - src.fixop.cli.fix_cmd._confirm_fix
+  - src.fixop.cli.fix_cmd._discover_fixable
+  - src.fixop.cli.fix_cmd._report_fixes
+  - src.fixop.cli.fix_cmd.cmd_fix
+  src.fixop.cli.output:
+  - src.fixop.cli.output._format_json
+  - src.fixop.cli.output._format_text
+  - src.fixop.cli.output._group_by_category
+  - src.fixop.cli.output._summarize
+  - src.fixop.cli.output.output_issues
+  src.fixop.cli.validate_cmd:
+  - src.fixop.cli.validate_cmd.cmd_check_tls
+  - src.fixop.cli.validate_cmd.cmd_validate
+  src.fixop.containers:
+  - src.fixop.containers.check_containers_running
+  - src.fixop.containers.check_disk_usage
+  - src.fixop.containers.check_memory
+  - src.fixop.containers.check_runtime
+  src.fixop.deploy:
+  - src.fixop.deploy._scan_file_for_vars
+  - src.fixop.deploy._scan_line_for_vars
+  - src.fixop.deploy.check_placeholders
+  - src.fixop.deploy.check_unresolved_vars
+  - src.fixop.deploy.scan_deploy_dir
+  src.fixop.dns:
+  - src.fixop.dns.check_container_dns
+  - src.fixop.dns.check_host_dns
+  - src.fixop.dns.check_systemd_resolved
+  - src.fixop.dns.fix_disable_systemd_resolved
+  - src.fixop.dns.fix_resolv_conf
+  src.fixop.drift:
+  - src.fixop.drift._extract_blocks
+  - src.fixop.drift.check_file_drift
+  - src.fixop.drift.check_untracked_files
+  src.fixop.firewall:
+  - src.fixop.firewall.check_nat_masquerade
+  - src.fixop.firewall.check_ufw_forward_policy
+  - src.fixop.firewall.fix_nat_masquerade
+  - src.fixop.firewall.fix_ufw_allow_routed
+  src.fixop.health:
+  - src.fixop.health._unhealthy
+  - src.fixop.health.check_http_endpoint
+  - src.fixop.health.check_ssh_service
+  - src.fixop.health.run_health_checks
+  src.fixop.ports:
+  - src.fixop.ports.check_port
+  - src.fixop.ports.check_ports
+  - src.fixop.ports.find_free_port_near
+  - src.fixop.ports.is_container_process
+  - src.fixop.ports.is_port_free
+  - src.fixop.ports.who_uses_port
+  src.fixop.ssh:
+  - src.fixop.ssh.check_ssh_connectivity
+  src.fixop.systemd:
+  - src.fixop.systemd.check_quadlet_loaded
+  - src.fixop.systemd.check_unit_status
+  - src.fixop.systemd.daemon_reload
+  - src.fixop.systemd.graceful_restart
+  - src.fixop.systemd.graceful_restart_all
+  src.fixop.tls:
+  - src.fixop.tls._connect_and_get_cert
+  - src.fixop.tls._handle_connection_error
+  - src.fixop.tls._validate_expiry
+  - src.fixop.tls._validate_issuer
+  - src.fixop.tls.check_acme_readiness
+  - src.fixop.tls.check_certificate
+  - src.fixop.tls.check_certificates
+  src.fixop.transport:
+  - src.fixop.transport.run_remote
+  - src.fixop.transport.test_ssh_connection
+entry_points:
+- src.fixop.classify.classify_error
+- src.fixop.classify.extract_missing_binary
+- src.fixop.classify.get_tip_for_failure
+- src.fixop.cli._dispatch_check
+- src.fixop.cli._dispatch_check_tls
+- src.fixop.cli._dispatch_doctor
+- src.fixop.cli._dispatch_drift
+- src.fixop.cli._dispatch_fix
+- src.fixop.cli._dispatch_validate
+- src.fixop.cli._has_errors
+- src.fixop.cli.main
+- src.fixop.deploy.check_files_exist
+- src.fixop.dns.fix_disable_systemd_resolved
+- src.fixop.dns.fix_resolv_conf
+- src.fixop.dns.generate_container_resolv_conf
+- src.fixop.firewall.check_nat_masquerade
+- src.fixop.firewall.fix_nat_masquerade
+- src.fixop.firewall.fix_ufw_allow_routed
+- src.fixop.health.check_tcp_port
+- src.fixop.health.run_health_checks
+- src.fixop.models.FixResult.__str__
+- src.fixop.models.HostContext.__str__
+- src.fixop.models.Issue.__str__
+- src.fixop.ports.check_ports
+- src.fixop.ssh.check_ssh_key
+- src.fixop.systemd.check_quadlet_loaded
+- src.fixop.systemd.daemon_reload
+- src.fixop.systemd.graceful_restart_all
+- src.fixop.tls.check_acme_readiness

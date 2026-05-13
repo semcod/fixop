@@ -5,15 +5,11 @@ Provides SSH mock fixtures so tests don't require actual remote hosts.
 
 from __future__ import annotations
 
-import subprocess
-from dataclasses import dataclass
-from typing import Optional
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from fixop.models import HostContext
-from fixop.ssh import RemoteResult
 
 
 @pytest.fixture
@@ -32,6 +28,7 @@ def mock_run_remote():
             # ... test code that calls run_remote()
     """
     with patch("fixop.ssh.subprocess.run") as mock_run:
+
         def _make_result(returncode=0, stdout="", stderr=""):
             result = MagicMock()
             result.returncode = returncode
@@ -51,21 +48,14 @@ def tmp_deploy_dir(tmp_path):
     deploy.mkdir()
 
     # Valid YAML
-    (deploy / "traefik.yml").write_text(
-        "entryPoints:\n  web:\n    address: ':80'\n"
-    )
+    (deploy / "traefik.yml").write_text("entryPoints:\n  web:\n    address: ':80'\n")
 
     # YAML with unresolved vars
     (deploy / "web.container").write_text(
-        "[Container]\n"
-        "Image=${REGISTRY}/web:${VERSION}\n"
-        "Environment=DB_HOST=${DB_HOST}\n"
+        "[Container]\nImage=${REGISTRY}/web:${VERSION}\nEnvironment=DB_HOST=${DB_HOST}\n"
     )
 
     # File with placeholders
-    (deploy / "config.yml").write_text(
-        "domain: your-domain.example.com\n"
-        "email: changeme@example.com\n"
-    )
+    (deploy / "config.yml").write_text("domain: your-domain.example.com\nemail: changeme@example.com\n")
 
     return deploy

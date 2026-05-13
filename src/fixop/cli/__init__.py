@@ -81,6 +81,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.version:
         from .. import __version__
+
         print(f"fixop {__version__}")
         return 0
 
@@ -107,31 +108,37 @@ def _has_errors(issues) -> bool:
 
 def _dispatch_check(args) -> int:
     from .check_cmd import cmd_check
+
     return cmd_check(args)
 
 
 def _dispatch_fix(args) -> int:
     from .fix_cmd import cmd_fix
+
     return cmd_fix(args)
 
 
 def _dispatch_validate(args) -> int:
     from .validate_cmd import cmd_validate
+
     return cmd_validate(args)
 
 
 def _dispatch_check_tls(args) -> int:
     from .validate_cmd import cmd_check_tls
+
     return cmd_check_tls(args)
 
 
 def _dispatch_drift(args) -> int:
     from .drift_cmd import cmd_drift
+
     return cmd_drift(args)
 
 
 def _dispatch_doctor(args) -> int:
     from .check_cmd import cmd_doctor
+
     return cmd_doctor(args)
 
 

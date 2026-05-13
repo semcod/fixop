@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from fixop.deploy import (
     check_unresolved_vars,

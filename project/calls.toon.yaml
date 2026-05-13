@@ -1,0 +1,191 @@
+# code2llm call graph | /home/tom/github/wronai/fixop
+# nodes: 73 | edges: 74 | modules: 19
+# CC̄=4.3
+
+HUBS[20]:
+  src.fixop.drift.check_file_drift
+    CC=10  in:1  out:26  total:27
+  src.fixop.check_all
+    CC=7  in:3  out:22  total:25
+  src.fixop.transport.run_remote
+    CC=4  in:20  out:4  total:24
+  src.fixop.drift.check_untracked_files
+    CC=11  in:1  out:21  total:22
+  src.fixop.health.check_http_endpoint
+    CC=11  in:1  out:20  total:21
+  src.fixop.ssh.check_ssh_connectivity
+    CC=9  in:1  out:19  total:20
+  src.fixop.systemd.graceful_restart
+    CC=6  in:1  out:18  total:19
+  src.fixop.deploy.scan_deploy_dir
+    CC=6  in:1  out:14  total:15
+  src.fixop.classify.classify_error
+    CC=10  in:0  out:14  total:14
+  src.fixop.deploy._scan_line_for_vars
+    CC=6  in:1  out:13  total:14
+  src.fixop.systemd.check_unit_status
+    CC=10  in:1  out:13  total:14
+  src.fixop.tls.check_acme_readiness
+    CC=10  in:0  out:14  total:14
+  src.fixop.cli.output._format_text
+    CC=9  in:1  out:13  total:14
+  src.fixop.tls._handle_connection_error
+    CC=5  in:1  out:12  total:13
+  src.fixop.containers.check_containers_running
+    CC=7  in:1  out:12  total:13
+  src.fixop.dns.check_container_dns
+    CC=9  in:1  out:11  total:12
+  src.fixop.health.check_ssh_service
+    CC=6  in:1  out:11  total:12
+  src.fixop.deploy.check_placeholders
+    CC=8  in:1  out:11  total:12
+  src.fixop.cli.fix_cmd.cmd_fix
+    CC=6  in:1  out:10  total:11
+  src.fixop.cli.check_cmd.cmd_check
+    CC=9  in:1  out:9  total:10
+
+MODULES:
+  src.fixop  [1 funcs]
+    check_all  CC=7  out:22
+  src.fixop.classify  [3 funcs]
+    _get_compiled_patterns  CC=3  out:1
+    _truncate  CC=2  out:2
+    classify_error  CC=10  out:14
+  src.fixop.cli  [6 funcs]
+    _dispatch_check  CC=1  out:1
+    _dispatch_check_tls  CC=1  out:1
+    _dispatch_doctor  CC=1  out:1
+    _dispatch_drift  CC=1  out:1
+    _dispatch_fix  CC=1  out:1
+    _dispatch_validate  CC=1  out:1
+  src.fixop.cli.check_cmd  [3 funcs]
+    _apply_fixes  CC=7  out:8
+    cmd_check  CC=9  out:9
+    cmd_doctor  CC=8  out:9
+  src.fixop.cli.drift_cmd  [1 funcs]
+    cmd_drift  CC=3  out:3
+  src.fixop.cli.fix_cmd  [6 funcs]
+    _apply_all  CC=6  out:6
+    _apply_single  CC=2  out:4
+    _confirm_fix  CC=1  out:5
+    _discover_fixable  CC=4  out:0
+    _report_fixes  CC=1  out:2
+    cmd_fix  CC=6  out:10
+  src.fixop.cli.output  [5 funcs]
+    _format_json  CC=2  out:1
+    _format_text  CC=9  out:13
+    _group_by_category  CC=2  out:2
+    _summarize  CC=7  out:3
+    output_issues  CC=2  out:4
+  src.fixop.cli.validate_cmd  [2 funcs]
+    cmd_check_tls  CC=3  out:3
+    cmd_validate  CC=2  out:2
+  src.fixop.containers  [4 funcs]
+    check_containers_running  CC=7  out:12
+    check_disk_usage  CC=5  out:8
+    check_memory  CC=6  out:8
+    check_runtime  CC=3  out:3
+  src.fixop.deploy  [5 funcs]
+    _scan_file_for_vars  CC=5  out:8
+    _scan_line_for_vars  CC=6  out:13
+    check_placeholders  CC=8  out:11
+    check_unresolved_vars  CC=5  out:5
+    scan_deploy_dir  CC=6  out:14
+  src.fixop.dns  [5 funcs]
+    check_container_dns  CC=9  out:11
+    check_host_dns  CC=6  out:8
+    check_systemd_resolved  CC=5  out:5
+    fix_disable_systemd_resolved  CC=1  out:5
+    fix_resolv_conf  CC=4  out:8
+  src.fixop.drift  [3 funcs]
+    _extract_blocks  CC=2  out:4
+    check_file_drift  CC=10  out:26
+    check_untracked_files  CC=11  out:21
+  src.fixop.firewall  [4 funcs]
+    check_nat_masquerade  CC=3  out:4
+    check_ufw_forward_policy  CC=5  out:7
+    fix_nat_masquerade  CC=1  out:5
+    fix_ufw_allow_routed  CC=1  out:5
+  src.fixop.health  [4 funcs]
+    _unhealthy  CC=1  out:2
+    check_http_endpoint  CC=11  out:20
+    check_ssh_service  CC=6  out:11
+    run_health_checks  CC=10  out:7
+  src.fixop.ports  [6 funcs]
+    check_port  CC=7  out:6
+    check_ports  CC=2  out:2
+    find_free_port_near  CC=5  out:5
+    is_container_process  CC=3  out:2
+    is_port_free  CC=2  out:3
+    who_uses_port  CC=5  out:8
+  src.fixop.ssh  [1 funcs]
+    check_ssh_connectivity  CC=9  out:19
+  src.fixop.systemd  [5 funcs]
+    check_quadlet_loaded  CC=4  out:6
+    check_unit_status  CC=10  out:13
+    daemon_reload  CC=1  out:5
+    graceful_restart  CC=6  out:18
+    graceful_restart_all  CC=3  out:2
+  src.fixop.tls  [7 funcs]
+    _connect_and_get_cert  CC=1  out:4
+    _handle_connection_error  CC=5  out:12
+    _validate_expiry  CC=4  out:7
+    _validate_issuer  CC=4  out:5
+    check_acme_readiness  CC=10  out:14
+    check_certificate  CC=3  out:5
+    check_certificates  CC=2  out:2
+  src.fixop.transport  [2 funcs]
+    run_remote  CC=4  out:4
+    test_ssh_connection  CC=3  out:7
+
+EDGES:
+  src.fixop.ports.find_free_port_near → src.fixop.ports.is_port_free
+  src.fixop.ports.check_port → src.fixop.ports.is_port_free
+  src.fixop.ports.check_port → src.fixop.ports.who_uses_port
+  src.fixop.ports.check_port → src.fixop.ports.find_free_port_near
+  src.fixop.ports.check_port → src.fixop.ports.is_container_process
+  src.fixop.ports.check_ports → src.fixop.ports.check_port
+  src.fixop.drift.check_file_drift → src.fixop.drift._extract_blocks
+  src.fixop.classify.classify_error → src.fixop.classify._get_compiled_patterns
+  src.fixop.classify.classify_error → src.fixop.classify._truncate
+  src.fixop.check_all → src.fixop.ssh.check_ssh_connectivity
+  src.fixop.check_all → src.fixop.dns.check_host_dns
+  src.fixop.check_all → src.fixop.dns.check_systemd_resolved
+  src.fixop.containers.check_runtime → src.fixop.transport.run_remote
+  src.fixop.containers.check_containers_running → src.fixop.transport.run_remote
+  src.fixop.containers.check_disk_usage → src.fixop.transport.run_remote
+  src.fixop.containers.check_memory → src.fixop.transport.run_remote
+  src.fixop.firewall.check_ufw_forward_policy → src.fixop.transport.run_remote
+  src.fixop.firewall.check_nat_masquerade → src.fixop.transport.run_remote
+  src.fixop.firewall.fix_ufw_allow_routed → src.fixop.transport.run_remote
+  src.fixop.firewall.fix_nat_masquerade → src.fixop.transport.run_remote
+  src.fixop.deploy._scan_file_for_vars → src.fixop.deploy._scan_line_for_vars
+  src.fixop.deploy.check_unresolved_vars → src.fixop.deploy._scan_file_for_vars
+  src.fixop.deploy.scan_deploy_dir → src.fixop.deploy.check_unresolved_vars
+  src.fixop.deploy.scan_deploy_dir → src.fixop.deploy.check_placeholders
+  src.fixop.dns.check_host_dns → src.fixop.transport.run_remote
+  src.fixop.dns.check_container_dns → src.fixop.transport.run_remote
+  src.fixop.dns.check_systemd_resolved → src.fixop.transport.run_remote
+  src.fixop.dns.fix_resolv_conf → src.fixop.transport.run_remote
+  src.fixop.dns.fix_disable_systemd_resolved → src.fixop.transport.run_remote
+  src.fixop.tls.check_certificate → src.fixop.tls._connect_and_get_cert
+  src.fixop.tls.check_certificate → src.fixop.tls._validate_expiry
+  src.fixop.tls.check_certificate → src.fixop.tls._validate_issuer
+  src.fixop.tls.check_certificate → src.fixop.tls._handle_connection_error
+  src.fixop.tls.check_certificates → src.fixop.tls.check_certificate
+  src.fixop.tls.check_acme_readiness → src.fixop.transport.run_remote
+  src.fixop.systemd.check_unit_status → src.fixop.transport.run_remote
+  src.fixop.systemd.check_quadlet_loaded → src.fixop.transport.run_remote
+  src.fixop.systemd.daemon_reload → src.fixop.transport.run_remote
+  src.fixop.systemd.graceful_restart → src.fixop.transport.run_remote
+  src.fixop.systemd.graceful_restart_all → src.fixop.systemd.graceful_restart
+  src.fixop.health.check_http_endpoint → src.fixop.health._unhealthy
+  src.fixop.health.run_health_checks → src.fixop.health.check_ssh_service
+  src.fixop.health.run_health_checks → src.fixop.health.check_http_endpoint
+  src.fixop.ssh.check_ssh_connectivity → src.fixop.transport.test_ssh_connection
+  src.fixop.cli.output.output_issues → src.fixop.cli.output._format_json
+  src.fixop.cli.output.output_issues → src.fixop.cli.output._format_text
+  src.fixop.cli.output._format_text → src.fixop.cli.output._group_by_category
+  src.fixop.cli.output._format_text → src.fixop.cli.output._summarize
+  src.fixop.cli.fix_cmd.cmd_fix → src.fixop.check_all
+  src.fixop.cli.fix_cmd.cmd_fix → src.fixop.cli.fix_cmd._discover_fixable

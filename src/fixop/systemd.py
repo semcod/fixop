@@ -34,43 +34,51 @@ def check_unit_status(ctx: HostContext, units: list[str]) -> list[Issue]:
         if status == "active":
             continue
         elif status == "inactive":
-            issues.append(Issue(
-                category=Category.SYSTEMD,
-                severity=Severity.WARNING,
-                message=f"Unit '{unit}' is inactive on {ctx.host}",
-                fix_strategy=FixStrategy.CONFIRM,
-                fix_command=f"systemctl start {unit}",
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.SYSTEMD,
+                    severity=Severity.WARNING,
+                    message=f"Unit '{unit}' is inactive on {ctx.host}",
+                    fix_strategy=FixStrategy.CONFIRM,
+                    fix_command=f"systemctl start {unit}",
+                    host=ctx.host,
+                )
+            )
         elif status == "failed":
             # Get failure reason
             journal = run_remote(ctx, f"journalctl -u {unit} --no-pager -n 5 2>/dev/null")
             details = journal.stdout.strip()[-300:] if journal.returncode == 0 else ""
-            issues.append(Issue(
-                category=Category.SYSTEMD,
-                severity=Severity.ERROR,
-                message=f"Unit '{unit}' has failed on {ctx.host}",
-                fix_strategy=FixStrategy.MANUAL,
-                fix_command=f"systemctl restart {unit}",
-                details=f"Recent logs:\n{details}" if details else None,
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.SYSTEMD,
+                    severity=Severity.ERROR,
+                    message=f"Unit '{unit}' has failed on {ctx.host}",
+                    fix_strategy=FixStrategy.MANUAL,
+                    fix_command=f"systemctl restart {unit}",
+                    details=f"Recent logs:\n{details}" if details else None,
+                    host=ctx.host,
+                )
+            )
         elif "could not be found" in (result.stderr or "").lower() or result.returncode == 4:
-            issues.append(Issue(
-                category=Category.SYSTEMD,
-                severity=Severity.INFO,
-                message=f"Unit '{unit}' not found on {ctx.host}",
-                fix_strategy=FixStrategy.MANUAL,
-                details=f"Unit may not be deployed yet. Check: ls /etc/containers/systemd/{unit}.container",
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.SYSTEMD,
+                    severity=Severity.INFO,
+                    message=f"Unit '{unit}' not found on {ctx.host}",
+                    fix_strategy=FixStrategy.MANUAL,
+                    details=f"Unit may not be deployed yet. Check: ls /etc/containers/systemd/{unit}.container",
+                    host=ctx.host,
+                )
+            )
         else:
-            issues.append(Issue(
-                category=Category.SYSTEMD,
-                severity=Severity.WARNING,
-                message=f"Unit '{unit}' status: {status} on {ctx.host}",
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.SYSTEMD,
+                    severity=Severity.WARNING,
+                    message=f"Unit '{unit}' status: {status} on {ctx.host}",
+                    host=ctx.host,
+                )
+            )
 
     return issues
 
@@ -85,28 +93,32 @@ def check_quadlet_loaded(ctx: HostContext, units: list[str]) -> list[Issue]:
     for unit in units:
         result = run_remote(ctx, f"ls /etc/containers/systemd/{unit}.container 2>/dev/null")
         if result.returncode != 0:
-            issues.append(Issue(
-                category=Category.SYSTEMD,
-                severity=Severity.WARNING,
-                message=f"Quadlet file not found: /etc/containers/systemd/{unit}.container on {ctx.host}",
-                fix_strategy=FixStrategy.MANUAL,
-                details="Upload the .container file and run: systemctl daemon-reload",
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.SYSTEMD,
+                    severity=Severity.WARNING,
+                    message=f"Quadlet file not found: /etc/containers/systemd/{unit}.container on {ctx.host}",
+                    fix_strategy=FixStrategy.MANUAL,
+                    details="Upload the .container file and run: systemctl daemon-reload",
+                    host=ctx.host,
+                )
+            )
             continue
 
         # Check if systemd recognizes the generated unit
         check = run_remote(ctx, f"systemctl cat {unit} 2>/dev/null")
         if check.returncode != 0:
-            issues.append(Issue(
-                category=Category.SYSTEMD,
-                severity=Severity.WARNING,
-                message=f"Quadlet file exists but unit '{unit}' not loaded on {ctx.host}",
-                fix_strategy=FixStrategy.CONFIRM,
-                fix_command="systemctl daemon-reload",
-                details="Run daemon-reload to pick up new/changed Quadlet files.",
-                host=ctx.host,
-            ))
+            issues.append(
+                Issue(
+                    category=Category.SYSTEMD,
+                    severity=Severity.WARNING,
+                    message=f"Quadlet file exists but unit '{unit}' not loaded on {ctx.host}",
+                    fix_strategy=FixStrategy.CONFIRM,
+                    fix_command="systemctl daemon-reload",
+                    details="Run daemon-reload to pick up new/changed Quadlet files.",
+                    host=ctx.host,
+                )
+            )
 
     return issues
 
@@ -146,7 +158,8 @@ def graceful_restart(ctx: HostContext, unit: str, delay: int = 3) -> FixResult:
     stop = run_remote(ctx, f"systemctl stop {unit}")
     if stop.returncode != 0:
         issue = Issue(
-            category=Category.SYSTEMD, severity=Severity.ERROR,
+            category=Category.SYSTEMD,
+            severity=Severity.ERROR,
             message=f"Failed to stop {unit} on {ctx.host}",
             host=ctx.host,
         )
@@ -165,7 +178,8 @@ def graceful_restart(ctx: HostContext, unit: str, delay: int = 3) -> FixResult:
     start = run_remote(ctx, f"systemctl start {unit}")
     if start.returncode != 0:
         issue = Issue(
-            category=Category.SYSTEMD, severity=Severity.ERROR,
+            category=Category.SYSTEMD,
+            severity=Severity.ERROR,
             message=f"Failed to start {unit} on {ctx.host}",
             host=ctx.host,
         )
@@ -176,7 +190,8 @@ def graceful_restart(ctx: HostContext, unit: str, delay: int = 3) -> FixResult:
     started = check.stdout.strip() == "active"
 
     issue = Issue(
-        category=Category.SYSTEMD, severity=Severity.INFO,
+        category=Category.SYSTEMD,
+        severity=Severity.INFO,
         message=f"Graceful restart of {unit} on {ctx.host}",
         host=ctx.host,
     )

@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from fixop.systemd import check_unit_status, check_quadlet_loaded, daemon_reload
-from fixop.models import Category, HostContext, Severity
+from fixop.models import HostContext, Severity
 from fixop.ssh import RemoteResult
 
 
