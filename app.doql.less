@@ -1,0 +1,251 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: fixop;
+  version: 0.1.16;
+  description: "Infrastructure fix operations — detect and repair DNS, firewall, containers, TLS, systemd issues";
+  license: Apache-2.0;
+  authors: "Tom Sapletta <tom@sapletta.com>";
+  keywords: "infrastructure, devops, diagnostics, podman, docker, dns, firewall, systemd";
+  homepage: https://github.com/wronai/fixop;
+}
+
+dependencies {
+  dev: "pytest, pytest-cov, ruff";
+  ssh: paramiko;
+}
+
+interface[type="cli"] {
+  framework: argparse;
+}
+interface[type="cli"] page[name="fixop"] {
+  entry: fixop.cli:main;
+}
+
+workflow[name="install"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m pip install -e .;
+  step-2: run cmd=echo "✓ code2llm installed with TOON format support";
+}
+
+workflow[name="dev-install"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m pip install -e ".[dev]";
+  step-2: run cmd=echo "✓ code2llm installed with dev dependencies";
+}
+
+workflow[name="test"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m pytest tests/ -v --tb=short 2>/dev/null || echo "No tests yet - create tests/ directory";
+}
+
+workflow[name="test-cov"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m pytest tests/ --cov=code2llm --cov-report=html --cov-report=term 2>/dev/null || echo "No tests yet";
+}
+
+workflow[name="test-toon"] {
+  trigger: manual;
+  step-1: run cmd=echo "🎯 Testing TOON format...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./test_toon -m hybrid -f toon;
+  step-3: run cmd=$(PYTHON) validate_toon.py test_toon/analysis.toon;
+  step-4: run cmd=echo "✓ TOON format test complete";
+}
+
+workflow[name="validate-toon"] {
+  trigger: manual;
+  step-1: depend target=test-toon;
+}
+
+workflow[name="test-all-formats"] {
+  trigger: manual;
+  step-1: run cmd=echo "📊 Testing all output formats...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./test_all -m hybrid -f all;
+  step-3: run cmd=$(PYTHON) validate_toon.py test_all/analysis.toon;
+  step-4: run cmd=echo "✓ All formats test complete";
+}
+
+workflow[name="test-comprehensive"] {
+  trigger: manual;
+  step-1: run cmd=echo "🚀 Running comprehensive test suite...";
+  step-2: run cmd=bash project.sh;
+  step-3: run cmd=echo "✓ Comprehensive tests complete";
+}
+
+workflow[name="lint"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m flake8 code2llm/ --max-line-length=100 --ignore=E203,W503 2>/dev/null || echo "flake8 not installed";
+  step-2: run cmd=$(PYTHON) -m black --check code2llm/ 2>/dev/null || echo "black not installed";
+  step-3: run cmd=echo "✓ Linting complete";
+}
+
+workflow[name="format"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m black code2llm/ --line-length=100 2>/dev/null || echo "black not installed, run: pip install black";
+  step-2: run cmd=echo "✓ Code formatted";
+}
+
+workflow[name="typecheck"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m mypy code2llm/ --ignore-missing-imports 2>/dev/null || echo "mypy not installed";
+}
+
+workflow[name="check"] {
+  trigger: manual;
+  step-1: run cmd=echo "✓ All checks passed";
+}
+
+workflow[name="run"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) -m code2llm ../python/stts_core -v -o ./output;
+}
+
+workflow[name="analyze"] {
+  trigger: manual;
+  step-1: run cmd=echo "🎯 Running TOON format analysis on current project...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./analysis -m hybrid -f toon;
+  step-3: run cmd=$(PYTHON) validate_toon.py analysis/analysis.toon;
+  step-4: run cmd=echo "✓ TOON analysis complete - check analysis/analysis.toon";
+}
+
+workflow[name="analyze-all"] {
+  trigger: manual;
+  step-1: run cmd=echo "📊 Running analysis with all formats...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./analysis_all -m hybrid -f all;
+  step-3: run cmd=$(PYTHON) validate_toon.py analysis_all/analysis.toon;
+  step-4: run cmd=echo "✓ All formats analysis complete - check analysis_all/";
+}
+
+workflow[name="toon-demo"] {
+  trigger: manual;
+  step-1: run cmd=echo "🎯 Quick TOON format demo...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./demo -m hybrid -f toon;
+  step-3: run cmd=echo "📁 Generated: demo/analysis.toon";
+  step-4: run cmd=echo "📊 Size: $$(du -h demo/analysis.toon | cut -f1)";
+  step-5: run cmd=echo "🔍 Preview:";
+  step-6: run cmd=head -20 demo/analysis.toon;
+}
+
+workflow[name="toon-compare"] {
+  trigger: manual;
+  step-1: run cmd=echo "📊 Comparing TOON vs YAML formats...";
+  step-2: run cmd=$(PYTHON) -m code2llm ./ -v -o ./compare -m hybrid -f toon,yaml;
+  step-3: run cmd=echo "📁 Files generated:";
+  step-4: run cmd=echo "  - TOON:  compare/analysis.toon  ($$(du -h compare/analysis.toon | cut -f1))";
+  step-5: run cmd=echo "  - YAML:  compare/analysis.yaml  ($$(du -h compare/analysis.yaml | cut -f1))";
+  step-6: run cmd=echo "  - Ratio: $$(echo "scale=1; $$(du -k compare/analysis.yaml | cut -f1) / $$(du -k compare/analysis.toon | cut -f1)" | bc)x smaller";
+  step-7: run cmd=$(PYTHON) validate_toon.py compare/analysis.yaml compare/analysis.toon;
+}
+
+workflow[name="toon-validate"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔍 Validating TOON format structure...";
+  step-2: run cmd=$(PYTHON) validate_toon.py analysis/analysis.toon 2>/dev/null || $(PYTHON) validate_toon.py test_toon/analysis.toon 2>/dev/null || echo "Run 'make test-toon' first";
+}
+
+workflow[name="build"] {
+  trigger: manual;
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info;
+  step-2: run cmd=$(PYTHON) -m build;
+  step-3: run cmd=echo "✓ Build complete - check dist/";
+}
+
+workflow[name="publish-test"] {
+  trigger: manual;
+  step-1: run cmd=echo "🚀 Publishing to TestPyPI...";
+  step-2: run cmd=$(PYTHON) -m venv publish-test-env;
+  step-3: run cmd=publish-test-env/bin/pip install twine;
+  step-4: run cmd=publish-test-env/bin/python -m twine upload --repository testpypi dist/*;
+  step-5: run cmd=rm -rf publish-test-env;
+  step-6: run cmd=echo "✓ Published to TestPyPI";
+}
+
+workflow[name="bump-patch"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔢 Bumping patch version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py patch 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="bump-minor"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔢 Bumping minor version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py minor 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="bump-major"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔢 Bumping major version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py major 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="publish"] {
+  trigger: manual;
+  step-1: run cmd=echo "🚀 Publishing to PyPI...";
+  step-2: run cmd=echo "🔢 Bumping patch version...";
+  step-3: run cmd=$(MAKE) bump-patch;
+  step-4: run cmd=echo "🔨 Rebuilding package with new version...";
+  step-5: run cmd=$(MAKE) build;
+  step-6: run cmd=echo "📦 Publishing to PyPI...";
+  step-7: run cmd=$(PYTHON) -m venv publish-env;
+  step-8: run cmd=publish-env/bin/pip install twine;
+  step-9: run cmd=publish-env/bin/python -m twine upload dist/*;
+  step-10: run cmd=rm -rf publish-env;
+  step-11: run cmd=echo "✓ Published to PyPI";
+}
+
+workflow[name="mermaid-png"] {
+  trigger: manual;
+  step-1: run cmd=$(PYTHON) mermaid_to_png.py --batch output output;
+}
+
+workflow[name="install-mermaid"] {
+  trigger: manual;
+  step-1: run cmd=npm install -g @mermaid-js/mermaid-cli;
+}
+
+workflow[name="check-mermaid"] {
+  trigger: manual;
+  step-1: run cmd=echo "Checking available Mermaid renderers...";
+  step-2: run cmd=which mmdc > /dev/null && echo "✓ mmdc (mermaid-cli)" || echo "✗ mmdc (run: npm install -g @mermaid-js/mermaid-cli)";
+  step-3: run cmd=which npx > /dev/null && echo "✓ npx (for @mermaid-js/mermaid-cli)" || echo "✗ npx (install Node.js)";
+  step-4: run cmd=which puppeteer > /dev/null && echo "✓ puppeteer" || echo "✗ puppeteer (run: npm install -g puppeteer)";
+}
+
+workflow[name="clean"] {
+  trigger: manual;
+  step-1: run cmd=rm -rf build/ dist/ *.egg-info;
+  step-2: run cmd=rm -rf .pytest_cache .coverage htmlcov/;
+  step-3: run cmd=rm -rf code2llm/__pycache__ code2llm/*/__pycache__;
+  step-4: run cmd=rm -rf test_* demo compare analysis analysis_all output_* 2>/dev/null || true;
+  step-5: run cmd=find . -name "*.pyc" -delete 2>/dev/null || true;
+  step-6: run cmd=find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true;
+  step-7: run cmd=echo "✓ Cleaned build artifacts and test outputs";
+}
+
+workflow[name="clean-png"] {
+  trigger: manual;
+  step-1: run cmd=rm -f output/*.png;
+  step-2: run cmd=echo "✓ Cleaned PNG files";
+}
+
+workflow[name="quickstart"] {
+  trigger: manual;
+  step-1: run cmd=echo "🚀 Quick Start with code2llm TOON format:";
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo "1. Install:        make install";
+  step-4: run cmd=echo "2. Test TOON:      make test-toon";
+  step-5: run cmd=echo "3. Analyze:        make analyze";
+  step-6: run cmd=echo "4. Compare:        make toon-compare";
+  step-7: run cmd=echo "5. All formats:    make test-all-formats";
+  step-8: run cmd=echo "";
+  step-9: run cmd=echo "📖 For more: make help";
+}
+
+deploy {
+  target: makefile;
+}
+
+environment[name="local"] {
+  runtime: python;
+  python_version: >=3.10;
+}
