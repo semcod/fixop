@@ -1,5 +1,17 @@
 # fixop — Infrastructure Fix Operations
 
+## AI Cost Tracking
+
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.20-green) ![AI Model](https://img.shields.io/badge/AI%20Model-openrouter%2Fqwen%2Fqwen3-coder-next-lightgrey)
+
+This project uses AI-generated code. Total cost: **$1.2000** with **8** AI commits.
+
+Generated on 2026-06-29 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/models/openrouter/qwen/qwen3-coder-next)
+
+---
+
+
+
 Detect and repair DNS, firewall, containers, TLS, systemd issues on local and remote servers. **Zero external dependencies** — uses only Python stdlib.
 
 ## Install
@@ -92,8 +104,7 @@ issues += check_placeholders(["deploy/config.yml"])
 
 ## License
 
-Apache License 2.0 - see [LICENSE](LICENSE) for details.
-
+Licensed under Apache-2.0.
 ## Author
 
-Created by **Tom Sapletta** - [tom@sapletta.com](mailto:tom@sapletta.com)
+Tom Sapletta
