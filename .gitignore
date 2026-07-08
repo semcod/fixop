@@ -94,3 +94,6 @@ htmlcov/
 # Backup files
 *.bak
 *.backup
+.code2llm_cache/
+.github/
+.ruff_cache/
