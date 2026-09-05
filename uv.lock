@@ -602,7 +602,7 @@ wheels = [
 
 [[package]]
 name = "costs"
-version = "0.1.52"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anthropic" },
@@ -614,11 +614,12 @@ dependencies = [
     { name = "pandas", version = "3.0.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "python-dotenv" },
     { name = "tiktoken" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c5/34/d88a86a72b19b6d399a67cdc7723b76a6e4dd36ed64c82021fc9c26d2125/costs-0.1.52.tar.gz", hash = "sha256:46feda45975cf5a66d8ddeae615b13bd66547bc9ad91fc56b7f58979218ba05b", size = 30688, upload-time = "2026-06-28T22:44:37.492Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/6f/7f3c72d6d4b5264bd5a3447e18a3b5184bffee143f72c8d023bb759afd1a/costs-0.2.0.tar.gz", hash = "sha256:3782bae859725dae30f697b5f3e5aa5d84e06feadebc5782ae706e21d46437af", size = 44606, upload-time = "2026-09-05T15:49:55.524Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/89/91/cb3ffe3638a2ff28b420cad95cc8bbbfc89f844b87162e57d98477e90e51/costs-0.1.52-py3-none-any.whl", hash = "sha256:d3944767c5e12a01a831c6a3250f4702694a7ade199bbd7c70ee0c2c140b6a6c", size = 35676, upload-time = "2026-06-28T22:44:36.264Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/7e/fc91d9fdc7a1ceb9116daffab27124a54f6e8887c9d59d906df43dcbfa6a/costs-0.2.0-py3-none-any.whl", hash = "sha256:4798b8535cbbcbb354e440ebce91365f17c910414bf5831a0610998ae6e679af", size = 48625, upload-time = "2026-09-05T15:49:54.054Z" },
 ]
 
 [[package]]
@@ -828,7 +829,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -931,14 +932,12 @@ version = "0.1.18"
 source = { editable = "." }
 dependencies = [
     { name = "costs" },
-    { name = "goal" },
     { name = "pfix" },
 ]
 
 [package.optional-dependencies]
 dev = [
     { name = "costs" },
-    { name = "goal" },
     { name = "pfix" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -948,12 +947,15 @@ ssh = [
     { name = "paramiko" },
 ]
 
+[package.dev-dependencies]
+automation = [
+    { name = "goal", marker = "python_full_version >= '3.12'" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "costs", specifier = ">=0.1.20" },
     { name = "costs", marker = "extra == 'dev'", specifier = ">=0.1.20" },
-    { name = "goal", specifier = ">=2.1.0" },
-    { name = "goal", marker = "extra == 'dev'", specifier = ">=2.1.0" },
     { name = "paramiko", marker = "extra == 'ssh'" },
     { name = "pfix", specifier = ">=0.1.60" },
     { name = "pfix", marker = "extra == 'dev'", specifier = ">=0.1.60" },
@@ -962,6 +964,9 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'dev'" },
 ]
 provides-extras = ["dev", "ssh"]
+
+[package.metadata.requires-dev]
+automation = [{ name = "goal", marker = "python_full_version >= '3.12'", specifier = ">=2.2.0" }]
 
 [[package]]
 name = "frozenlist"
@@ -1119,7 +1124,7 @@ wheels = [
 
 [[package]]
 name = "goal"
-version = "2.1.262"
+version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1129,9 +1134,9 @@ dependencies = [
     { name = "tomlkit" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/a4/39210297a1561695939789bd2b92397e2e833e8716d4efcf505a8d21d3d0/goal-2.1.262.tar.gz", hash = "sha256:6283b26a2e8405ace61e539232e69698574981d6aa129a00e7b42be51e5f4bab", size = 302063, upload-time = "2026-06-28T22:47:08.142Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/9c/135e3f67a7324c3c49ef4246f5518b59ad90226e62c3d30ae20cba005c1d/goal-2.2.0.tar.gz", hash = "sha256:e9e2c1ac9493dae3b887b16d503f7c1f83d02ddcbdd3c5cf58d44a458bb2662f", size = 399786, upload-time = "2026-09-05T19:41:55.329Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/e8/46823636d6d51e6b8d87c4fd67ec86ed9000d311f84c917b5629327ba3a5/goal-2.1.262-py3-none-any.whl", hash = "sha256:8698aefa60d983ac261e3d4aa5b21e116be801fc63d77de988479d9877744c84", size = 289987, upload-time = "2026-06-28T22:47:06.285Z" },
+    { url = "https://files.pythonhosted.org/packages/24/69/8a4cf5710683bb777f1f6e4cd44dd3907befe97b94c6ea6e97d4305b4e44/goal-2.2.0-py3-none-any.whl", hash = "sha256:0d8f93aa317ac92a66b64b797e210a5d66044ce8db2cb05b012b03d42aced95e", size = 349709, upload-time = "2026-09-05T19:41:53.615Z" },
 ]
 
 [[package]]
@@ -2069,10 +2074,10 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "python-dateutil", marker = "python_full_version < '3.11'" },
-    { name = "pytz", marker = "python_full_version < '3.11'" },
-    { name = "tzdata", marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "python-dateutil" },
+    { name = "pytz" },
+    { name = "tzdata" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/33/01/d40b85317f86cf08d853a4f495195c73815fdf205eef3993821720274518/pandas-2.3.3.tar.gz", hash = "sha256:e05e1af93b977f7eafa636d043f9f94c7ee3ac81af99c13508215942e64c993b", size = 4495223, upload-time = "2025-09-29T23:34:51.853Z" }
 wheels = [
@@ -2141,10 +2146,10 @@ resolution-markers = [
     "python_full_version == '3.11.*' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "python-dateutil", marker = "python_full_version >= '3.11'" },
-    { name = "tzdata", marker = "(python_full_version >= '3.11' and sys_platform == 'emscripten') or (python_full_version >= '3.11' and sys_platform == 'win32')" },
+    { name = "python-dateutil" },
+    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5a/fd/e0194474c71dbfba82e744f66945c274f15b667acd5f8c117b12555fb91e/pandas-3.0.4.tar.gz", hash = "sha256:62f6062586d159663825f06e70ef49cd1572d45824cb63a9559f3ffd1d0d2a20", size = 4658146, upload-time = "2026-06-28T15:31:51.3Z" }
 wheels = [
@@ -2238,7 +2243,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess", marker = "python_full_version < '3.11' or sys_platform != 'win32'" },
+    { name = "ptyprocess" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -2247,7 +2252,7 @@ wheels = [
 
 [[package]]
 name = "pfix"
-version = "0.1.74"
+version = "0.1.79"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "litellm" },
@@ -2256,9 +2261,9 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/51/51/fdbc91a818bc5d30fd1f73d4a1a5c1683d3eb74959119772944c6d12b385/pfix-0.1.74.tar.gz", hash = "sha256:eaae020c3899dfde5117b0d89c3c96bb57487dde404a019fac23497d62585cac", size = 2839963, upload-time = "2026-06-29T07:38:19.223Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ae/7e/252be5e1d55321b947013010f45b02d781de87e25b9a524c0ee72c1ad3c0/pfix-0.1.79.tar.gz", hash = "sha256:6bc4c572e22e0f0d952bc5e2df78f52f8f999cab64e22138b097b2eab4d83092", size = 2845663, upload-time = "2026-07-05T17:00:57.331Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/83/56a88a9c26ce19b6212a56f0f0b33a2b788d28402a2d8cd8faa50302fb1a/pfix-0.1.74-py3-none-any.whl", hash = "sha256:e9d1ccc9dc3e06e8438c6c2f03a63c2d869e484b3692cad5ee70cc433d05e210", size = 149279, upload-time = "2026-06-29T07:38:14.551Z" },
+    { url = "https://files.pythonhosted.org/packages/39/bf/548982294e795d79003680b2214c7f5dd00ca4b0ea856064bf9cb6869ba7/pfix-0.1.79-py3-none-any.whl", hash = "sha256:bb7ab83b99c0bfbaae5e6e95cb801a27d4fd68749485600fdfe49dad00607461", size = 151754, upload-time = "2026-07-05T17:00:52.816Z" },
 ]
 
 [[package]]

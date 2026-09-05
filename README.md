@@ -108,3 +108,7 @@ Licensed under Apache-2.0.
 ## Author
 
 Tom Sapletta
+
+## Dependency maintenance
+
+See [internal dependency updates](docs/dependencies.md) for daily updates, locked tests and Python support.
