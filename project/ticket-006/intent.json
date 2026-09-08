@@ -1,0 +1,17 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-006",
+  "summary": "Document and verify shared protected Python execution",
+  "workstream": "integration",
+  "allowedPaths": [
+    "docs/information/local-verification.md",
+    "project/ticket-006/**"
+  ],
+  "forbiddenPaths": [
+    "pyproject.toml",
+    "uv.lock",
+    ".github/workflows/**"
+  ],
+  "dependsOn": [],
+  "conflictsWith": []
+}
